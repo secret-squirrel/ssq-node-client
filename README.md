@@ -1,4 +1,1 @@
-pms-node-client
-===============
-
-PMS Node client library
+# Secret Squirrel CLI
