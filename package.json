@@ -1,0 +1,27 @@
+{
+  "name": "pms-node-client",
+  "version": "0.0.0",
+  "description": "PMS Client Library - Node",
+  "main": "example-client.js",
+  "scripts": {
+    "test": "./node_modules/.bin/mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/twg/pms-node-client"
+  },
+  "author": "",
+  "bugs": {
+    "url": "https://github.com/twg/pms-node-client/issues"
+  },
+  "dependencies": {
+    "q": "~1.0.1",
+    "ws": "~0.4.31",
+    "ursa": "~0.8.0"
+  },
+  "devDependencies": {
+    "mocha": "~1.18.2",
+    "chai": "~1.9.1",
+    "chai-as-promised": "~4.1.1"
+  }
+}
