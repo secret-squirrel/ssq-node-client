@@ -1,18 +1,18 @@
 {
-  "name": "pms-node-client",
+  "name": "secretsquirrel-cli",
   "version": "0.0.0",
-  "description": "PMS Client Library - Node",
-  "main": "example-client.js",
+  "description": "Secret Squirrel - Console Client",
+  "main": "squirrel.js",
   "scripts": {
     "test": "./node_modules/.bin/mocha"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/twg/pms-node-client"
+    "url": "https://github.com/twg/secretsquirrel-cli"
   },
   "author": "",
   "bugs": {
-    "url": "https://github.com/twg/pms-node-client/issues"
+    "url": "https://github.com/twg/secretsquirrel-cli/issues"
   },
   "dependencies": {
     "q": "~1.0.1",
