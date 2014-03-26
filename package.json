@@ -2,7 +2,7 @@
   "name": "secretsquirrel-cli",
   "version": "0.0.0",
   "description": "Secret Squirrel - Console Client",
-  "main": "squirrel.js",
+  "main": "squirrel",
   "scripts": {
     "test": "./node_modules/.bin/mocha"
   },
