@@ -14,14 +14,6 @@ function readKey(file, next) {
   })
 }
 
-function createPrivateKey(bits, passPhrase) {
-  var key = ursa.generatePrivateKey(bits).toPrivatePem()
-  if(!passPhrase) passPhrase = ''
-  var cipher = crypto.createCipher('aes-256-cbc', passPhrase)
-  var cipherText = cipher.update(key, 'binary', 'binary')
-  return cipherText + cipher.final('binary')
-}
-
 function generateKeyPair(bits) {
   var key = ursa.generatePrivateKey(bits)
   var privateKey = key.toPrivatePem()
@@ -90,6 +82,5 @@ module.exports = {
   readKey: readKey,
   generateKeyPair: generateKeyPair,
   createKeyPair: createKeyPair,
-  createPrivateKey: createPrivateKey,
   saveToKeyRing: saveToKeyRing
 }
