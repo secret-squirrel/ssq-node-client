@@ -1,12 +1,84 @@
+var path = require('path')
+var fs = require('fs')
 var crypto = require('crypto')
 var ursa = require('ursa')
 
-module.exports = {
-  create: function(bits, passPhrase) {
-    var key = ursa.generatePrivateKey(bits).toPrivatePem()
-    if(!passPhrase) passPhrase = ''
-    var cipher = crypto.createCipher('aes-256-cbc', passPhrase)
-    var cipherText = cipher.update(key, 'binary', 'binary')
-    return cipherText + cipher.final('binary')
+var configDir = path.join(process.env['HOME'], '.squirrel')
+function createPrivateKey(bits, passPhrase) {
+  var key = ursa.generatePrivateKey(bits).toPrivatePem()
+  if(!passPhrase) passPhrase = ''
+  var cipher = crypto.createCipher('aes-256-cbc', passPhrase)
+  var cipherText = cipher.update(key, 'binary', 'binary')
+  return cipherText + cipher.final('binary')
+}
+
+function generateKeyPair(bits) {
+  var key = ursa.generatePrivateKey(bits)
+  var privateKey = key.toPrivatePem()
+  var publicKey = key.toPublicPem()
+
+  return {
+    privateKey: privateKey,
+    publicKey: publicKey
   }
+}
+
+function encrypt(data, cipher, passPhrase) {
+  if(!passPhrase) passPhrase = ''
+  var cipher = crypto.createCipher(cipher, passPhrase)
+  var cipherText = cipher.update(data, 'binary', 'binary')
+  return cipherText + cipher.final('binary')
+}
+
+function decrypt(data, cipher, passPhrase) {
+  if(!passPhrase) passPhrase = ''
+  var decipher = crypto.createDecipher(cipher, passPhrase)
+  var decrypted = decipher.update(data, 'binary')
+  return decrypted + decipher.final('binary')
+}
+
+function createKeyPair(passPhrase, bits) {
+  if(!bits) bits = 2048
+  var keyPair = generateKeyPair(bits)
+  keyPair.privateKey = encrypt(keyPair.privateKey, 'aes-256-cbc', passPhrase)
+  return keyPair
+}
+
+function saveToKeyRing(keyPair) {
+  fs.exists(configDir, function(exists) {
+    if(!exists) {
+      fs.mkdir(configDir, function(ex) {
+        if(ex) throw ex
+        save(keyPair)
+      })
+    } else {
+      save(keyPair)
+    }
+  })
+
+  function save(keyPair) {
+    var privateKeyFile = path.join(configDir, 'id_rsa')
+    fs.writeFile(privateKeyFile, 
+      keyPair.privateKey, 
+      { mode: 384 }, // 0600
+      function(err) {
+        if(err) throw err
+        console.log('Saved private key to ' + privateKeyFile)
+      })
+
+    var publicKeyFile = path.join(configDir, 'id_rsa.pub')
+    fs.writeFile(publicKeyFile, 
+      keyPair.publicKey, 
+      function(err) {
+        if(err) throw err
+        console.log('Saved public key to ' + publicKeyFile)
+      })
+  }
+}
+
+module.exports = {
+  generateKeyPair: generateKeyPair,
+  createKeyPair: createKeyPair,
+  createPrivateKey: createPrivateKey,
+  saveToKeyRing: saveToKeyRing
 }
