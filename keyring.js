@@ -4,6 +4,16 @@ var crypto = require('crypto')
 var ursa = require('ursa')
 
 var configDir = path.join(process.env['HOME'], '.squirrel')
+
+function readKey(file, next) {
+  var keyFile = path.join(configDir, file)
+
+  fs.readFile(keyFile, function(err, data) {
+    if(err) return next(err)
+    next(null, data)
+  })
+}
+
 function createPrivateKey(bits, passPhrase) {
   var key = ursa.generatePrivateKey(bits).toPrivatePem()
   if(!passPhrase) passPhrase = ''
@@ -77,6 +87,7 @@ function saveToKeyRing(keyPair) {
 }
 
 module.exports = {
+  readKey: readKey,
   generateKeyPair: generateKeyPair,
   createKeyPair: createKeyPair,
   createPrivateKey: createPrivateKey,
