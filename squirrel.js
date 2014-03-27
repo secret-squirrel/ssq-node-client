@@ -19,7 +19,9 @@ switch(command) {
     break
 
   case 'add-key':
-    readKey('id_rsa.pub', server.addPublicKey)
+    server.open(function(err) {
+      readKey('id_rsa.pub', server.addPublicKey)
+    })
     break
 
   default:
