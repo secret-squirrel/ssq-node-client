@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+process.env.NODE_ENV = process.env.NODE_ENV || 'development'
+
 var argv = require('yargs').argv
 var path = require('path')
 var keyring = require('./keyring')

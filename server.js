@@ -1,8 +1,13 @@
 var WebSocket = require('ws')
 var ws
 
+var options = {}
+if(process.env.NODE_ENV === 'development') {
+  options.rejectUnauthorized = false
+}
+
 function open(callback) {
-  ws = new WebSocket('ws://localhost:8080')
+  ws = new WebSocket('wss://localhost:8080', options)
 
   ws.on('open', function(err) {
     callback(err, ws)
