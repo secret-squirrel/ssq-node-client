@@ -1,9 +1,10 @@
 var uuid = require('node-uuid')
 var WebSocket = require('ws')
+var env = require('./env')
 var ws
 
 var options = {}
-if(process.env.NODE_ENV === 'development') {
+if(env.node_env() === 'development') {
   options.rejectUnauthorized = false
 }
 
