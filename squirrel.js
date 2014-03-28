@@ -16,10 +16,6 @@ switch(command) {
     keyring.saveToKeyRing(keyPair)
     break
 
-  case 'ping': // for testing the server.
-    server.ping()
-    break
-
   case 'add-key':
     server.open(function(err) {
       readKey('id_rsa.pub', server.addPublicKey)

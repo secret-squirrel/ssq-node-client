@@ -1,3 +1,4 @@
+var uuid = require('node-uuid')
 var WebSocket = require('ws')
 var ws
 
@@ -23,24 +24,29 @@ function close(callback) {
   ws.close(callback)
 }
 
-function ping() {
-  send('PING!')
-}
-
 function addPublicKey(publicKey, callback) {
-  send('Check out this sweet public key: \n' + publicKey, function(err) {
+  send('UserPublicKey.put', { key: publicKey }, function(err) {
     close()
-    if (callback) callback(err)
+    if(callback) callback(err)
   })
 }
 
-function send(msg, callback) {
-  ws.send(msg, callback)
+function send(method, params, callback) {
+  var id = uuid.v4()
+  var msg = {
+    jsonrpc: '2.0',
+    id: id,
+    method: method,
+    params: params
+  }
+
+  ws.send(JSON.stringify(msg), callback)
+
+  return id
 }
 
 module.exports = {
   open: open,
   close: close,
-  ping: ping,
   addPublicKey: addPublicKey
 }
