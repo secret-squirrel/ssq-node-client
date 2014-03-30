@@ -20,6 +20,23 @@ switch(command) {
     })
     break
 
+  case 'create-user':
+    var firstName = argv.firstName
+    var lastName = argv.lastName
+    var email = argv.email
+
+    server.open(function(err) {
+      server.createUser(firstName, lastName, email, function(err, result) { 
+        if(err) {
+          console.log('create-user failed: ' + JSON.stringify(err))
+        } else {
+          console.log('create-user completed successfully: ' + JSON.stringify(result))
+        }
+        server.close()
+      })
+    })
+    break
+
   case 'users': 
     server.open(function(err) {
       server.users(argv._[1], function(err) { console.log(err) })
@@ -31,13 +48,13 @@ switch(command) {
     break
 }
 
-function readKey(file, next) {
+function readKey(file, callback) {
   keyring.readKey(file, function(err, key) {
     if(err) {
       console.log('[ERROR] Unable to read key file: ' + err)
       usage()
     } else {
-      next(key)
+      callback(key)
     }
   })
 }

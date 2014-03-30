@@ -1,12 +1,24 @@
 var uuid = require('node-uuid')
 var WebSocket = require('ws')
 var env = require('./env')
-
+var callbacks = {}
 var ws
+var timers = []
 
 var options = {}
 if(env.node_env() === 'development') {
   options.rejectUnauthorized = false
+}
+
+function awaitResponse(id, callback) {
+  callbacks[id] = callback
+  var timer = setTimeout(function() {
+    console.log('Timed out.')
+    delete callbacks[id]
+    close()
+  }, 5000)
+
+  timers.push(timer)
 }
 
 function open(callback) {
@@ -17,12 +29,30 @@ function open(callback) {
   })
 
   ws.on('message', function(data, flags) {
-    // TODO: dispatch to RPC!
-    console.log(data)
+    var response = JSON.parse(data)
+    if(isResponse(response)) {
+      if(response.id) {
+        var callback = callbacks[response.id]
+        if(response.result) {
+          callback(null, response.result)
+        } else {
+          callback(response.error)
+        }
+        delete callbacks[response.id]
+      }
+    } else {
+      // TODO: dispatch to RPC!
+      console.log('Received request from server: ' + data)
+    }
   })
 }
 
+function isResponse(msg) {
+  return msg.result || msg.error
+}
+
 function close(callback) {
+  timers.forEach(clearTimeout)
   ws.close(callback)
 }
 
@@ -40,6 +70,11 @@ function users(query, callback) {
   })
 }
 
+function createUser(firstName, lastName, email, callback) {
+  var params = { user: { firstName: firstName, lastName: lastName, email: email } }
+  send('User.put', params, callback)
+}
+
 function send(method, params, callback) {
   var id = uuid.v4()
   var msg = {
@@ -49,14 +84,14 @@ function send(method, params, callback) {
     params: params
   }
 
-  ws.send(JSON.stringify(msg), callback)
-
-  return id
+  awaitResponse(id, callback)
+  ws.send(JSON.stringify(msg))
 }
 
 module.exports = {
   open: open,
   close: close,
   addPublicKey: addPublicKey,
-  users: users
+  users: users,
+  createUser: createUser
 }
