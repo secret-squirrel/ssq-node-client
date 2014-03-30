@@ -1,6 +1,7 @@
 var uuid = require('node-uuid')
 var WebSocket = require('ws')
 var env = require('./env')
+
 var ws
 
 var options = {}
@@ -32,6 +33,13 @@ function addPublicKey(publicKey, callback) {
   })
 }
 
+function users(query, callback) {
+  send('User.index', { searchQuery: query }, function(err) {
+    close()
+    if(callback) callback(err)
+  })
+}
+
 function send(method, params, callback) {
   var id = uuid.v4()
   var msg = {
@@ -49,5 +57,6 @@ function send(method, params, callback) {
 module.exports = {
   open: open,
   close: close,
-  addPublicKey: addPublicKey
+  addPublicKey: addPublicKey,
+  users: users
 }

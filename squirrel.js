@@ -20,6 +20,12 @@ switch(command) {
     })
     break
 
+  case 'users': 
+    server.open(function(err) {
+      server.users(argv._[1], function(err) { console.log(err) })
+    })
+    break
+
   default:
     usage()
     break
