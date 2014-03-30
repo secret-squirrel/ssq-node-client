@@ -14,12 +14,6 @@ switch(command) {
     keyring.saveToKeyRing(keyPair)
     break
 
-  case 'add-key':
-    server.open(function(err) {
-      readKey('id_rsa.pub', server.addPublicKey)
-    })
-    break
-
   case 'create-user':
     var firstName = argv.firstName
     var lastName = argv.lastName
@@ -34,12 +28,6 @@ switch(command) {
         }
         server.close()
       })
-    })
-    break
-
-  case 'users': 
-    server.open(function(err) {
-      server.users(argv._[1], function(err) { console.log(err) })
     })
     break
 
@@ -61,6 +49,9 @@ function readKey(file, callback) {
 
 function usage() {
   console.log('node ' + app + ' <command> [options]')
-  console.log('\tcreate-keypair:')
+  console.log('Commands:')
+  console.log('create-keypair')
   console.log('\tGenerate a new RSA private key at ~/.squirrel/id_rsa')
+  console.log('create-user --firstName [firstName] --lastName [lastName] --email [email]')
+  console.log('\tCreate a new user.')
 }

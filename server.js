@@ -1,9 +1,9 @@
 var uuid = require('node-uuid')
-var WebSocket = require('ws')
-var env = require('./env')
-var callbacks = {}
-var ws
-var timers = []
+  , WebSocket = require('ws')
+  , env = require('./env')
+  , callbacks = {}
+  , timers = []
+  , ws
 
 var options = {}
 if(env.node_env() === 'development') {
@@ -29,22 +29,22 @@ function open(callback) {
   })
 
   ws.on('message', function(data, flags) {
-    var response = JSON.parse(data)
-    if(isResponse(response)) {
-      if(response.id) {
-        var callback = callbacks[response.id]
-        if(response.result) {
-          callback(null, response.result)
-        } else {
-          callback(response.error)
-        }
-        delete callbacks[response.id]
-      }
+    var msg = JSON.parse(data)
+    if(isResponse(msg)) {
+      handleResponse(msg)
     } else {
       // TODO: dispatch to RPC!
       console.log('Received request from server: ' + data)
     }
   })
+}
+
+function handleResponse(response) {
+  if(response.id) {
+    var callback = callbacks[response.id]
+    callback(response.error, response.result)
+    delete callbacks[response.id]
+  }
 }
 
 function isResponse(msg) {
@@ -54,20 +54,6 @@ function isResponse(msg) {
 function close(callback) {
   timers.forEach(clearTimeout)
   ws.close(callback)
-}
-
-function addPublicKey(publicKey, callback) {
-  send('UserPublicKey.put', { key: publicKey }, function(err) {
-    close()
-    if(callback) callback(err)
-  })
-}
-
-function users(query, callback) {
-  send('User.index', { searchQuery: query }, function(err) {
-    close()
-    if(callback) callback(err)
-  })
 }
 
 function createUser(firstName, lastName, email, callback) {
@@ -91,7 +77,5 @@ function send(method, params, callback) {
 module.exports = {
   open: open,
   close: close,
-  addPublicKey: addPublicKey,
-  users: users,
   createUser: createUser
 }
