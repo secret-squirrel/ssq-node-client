@@ -8,10 +8,12 @@ var server = require('./server')
 var app = path.basename(process.argv[1])
 var command = argv._[0]
 
+var configDir = path.join(process.env['HOME'], '.squirrel')
+
 switch(command) {
   case 'create-keypair':
     var keyPair = keyring.createKeyPair()
-    keyring.saveToKeyRing(keyPair)
+    keyring.saveToKeyRing(keyPair, configDir)
     break
 
   case 'create-user':

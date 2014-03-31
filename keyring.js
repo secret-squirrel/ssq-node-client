@@ -3,8 +3,6 @@ var fs = require('fs')
 var crypto = require('crypto')
 var ursa = require('ursa')
 
-var configDir = path.join(process.env['HOME'], '.squirrel')
-
 function readKey(file, next) {
   var keyFile = path.join(configDir, file)
 
@@ -46,7 +44,7 @@ function createKeyPair(passPhrase, bits) {
   return keyPair
 }
 
-function saveToKeyRing(keyPair) {
+function saveToKeyRing(keyPair, configDir) {
   fs.exists(configDir, function(exists) {
     if(!exists) {
       fs.mkdir(configDir, function(ex) {

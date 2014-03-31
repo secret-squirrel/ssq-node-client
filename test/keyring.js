@@ -1,3 +1,5 @@
+var fs = require('fs')
+var path = require('path')
 var crypto = require('crypto')
 var ursa = require('ursa')
 var keyring = require('../keyring')
@@ -24,4 +26,13 @@ describe('keyring', function() {
     assert(ursa.isPrivateKey(key), 'Return a URSA private key')
   })
 
+  it('saves keypairs to the config directory', function() {
+    var configDir = path.join(process.cwd(), 'tmp/.squirrel')
+
+    var keyPair = keyring.generateKeyPair(2048)
+    keyring.saveToKeyRing(keyPair, configDir)
+
+    assert(fs.existsSync(path.join(configDir, 'id_rsa')), 'Saves private key to disk')
+    assert(fs.existsSync(path.join(configDir, 'id_rsa.pub')), 'Saves public key to disk')
+  })
 })
