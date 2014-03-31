@@ -13,6 +13,12 @@
 
 # Secret Squirrel - Console client
 
+## Introduction
+
+This project serves as a reference implementation for future Secret Squirrel clients. See the [server wiki](https://github.com/twg/secretsquirrel-server/wiki) for an architecture overview.
+
+Make sure to checkout the [server](https://github.com/twg/secretsquirrel-server) and [desktop](https://github.com/twg/secretsquirrel-desktop) clients.
+
 ## Getting Started
 
 ```
@@ -21,7 +27,20 @@ npm install
 node squirrel.js
 ```
 
+Get the [server](https://github.com/twg/secretsquirrel-server) up and running.
+
+So far you can generate a new keypair:
+
+`node squirrel.js create-keypair`
+
+And create a user:
+
+`node squirrel.js create-user --firstName Matt --lastName MacAulay --email mac@twg.ca`
+
+
 ## Tests
+
+To run the test suite:
 
 `npm test`
 
