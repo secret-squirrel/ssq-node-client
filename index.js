@@ -14,8 +14,7 @@ program
 if(program.createKeypair) {
   app.createKeyPair()
 }
-
-if(program.createUser) {
+else if(program.createUser) {
   prompt.get(['firstName', 'lastName', 'email'], function(err, result) {
     var firstName = program.firstName
     var lastName = program.lastName
@@ -23,4 +22,7 @@ if(program.createUser) {
 
     app.createUser(firstName, lastName, email)
   })
+}
+else{
+  program.help()
 }
