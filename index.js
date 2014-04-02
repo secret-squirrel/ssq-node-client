@@ -23,3 +23,6 @@ if(program.createUser) {
     squirrel.createUser(name, email)
   })
 }
+else{
+  program.help()
+}
