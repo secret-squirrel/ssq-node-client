@@ -16,11 +16,10 @@ if(program.createKeypair) {
 }
 
 if(program.createUser) {
-  prompt.get(['firstName', 'lastName', 'email'], function(err, result) {
-    var firstName = program.firstName
-    var lastName = program.lastName
-    var email = program.email
+  prompt.get(['name', 'email'], function(err, result) {
+    var name = result.name
+    var email = result.email
 
-    app.createUser(firstName, lastName, email)
+    app.createUser(name, email)
   })
 }
