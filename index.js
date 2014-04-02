@@ -3,7 +3,7 @@
 var program = require('commander')
 var prompt = require('prompt')
 var pkg = require('./package.json')
-var app = require('./lib/squirrel')
+var squirrel = require('./lib/squirrel')
 
 program
   .version(pkg.version)
@@ -12,7 +12,7 @@ program
   .parse(process.argv)
 
 if(program.createKeypair) {
-  app.createKeyPair()
+  squirrel.createKeyPair()
 }
 
 if(program.createUser) {
@@ -20,6 +20,6 @@ if(program.createUser) {
     var name = result.name
     var email = result.email
 
-    app.createUser(name, email)
+    squirrel.createUser(name, email)
   })
 }
