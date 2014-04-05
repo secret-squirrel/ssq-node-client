@@ -22,7 +22,6 @@
     "node-uuid": "~1.4.1",
     "commander": "~2.2.0",
     "prompt": "~0.2.12",
-    "jayson": "https://github.com/mmacaulay/jayson/tarball/master"
   },
   "devDependencies": {
     "mocha": "~1.18.2",
