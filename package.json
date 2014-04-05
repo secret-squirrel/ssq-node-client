@@ -18,7 +18,7 @@
     "yargs": "~1.2.1",
     "q": "~1.0.1",
     "ws": "~0.4.31",
-    "ursa": "~0.8.0",
+    "ursa": "https://github.com/mmacaulay/ursa/tarball/master",
     "node-uuid": "~1.4.1",
     "commander": "~2.2.0",
     "prompt": "~0.2.12"

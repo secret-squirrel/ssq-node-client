@@ -14,7 +14,7 @@ program
 if(program.createKeypair) {
   // TODO: validation. bits should be at least 2048, and should default to
   // that. passphrase should be of a certain length.
-  prompt.get(['bits', 'passphrase'], function(err, result) {
+  prompt.get(['bits', 'passPhrase'], function(err, result) {
     var bits = parseInt(result.bits)
     var passPhrase = result.passPhrase
     squirrel.createKeyPair(passPhrase, bits)
