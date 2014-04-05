@@ -12,10 +12,14 @@ program
   .parse(process.argv)
 
 if(program.createKeypair) {
-  squirrel.createKeyPair()
-}
-
-if(program.createUser) {
+  // TODO: validation. bits should be at least 2048, and should default to
+  // that. passphrase should be of a certain length.
+  prompt.get(['bits', 'passphrase'], function(err, result) {
+    var bits = parseInt(result.bits)
+    var passPhrase = result.passPhrase
+    squirrel.createKeyPair(passPhrase, bits)
+  })
+} else if(program.createUser) {
   prompt.get(['name', 'email'], function(err, result) {
     var name = result.name
     var email = result.email
