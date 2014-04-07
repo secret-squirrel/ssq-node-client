@@ -21,6 +21,7 @@
     "ursa": "https://github.com/mmacaulay/ursa/tarball/master",
     "node-uuid": "~1.4.1",
     "commander": "~2.2.0",
+    "async": "~0.6.2",
     "prompt": "~0.2.12"
   },
   "devDependencies": {
