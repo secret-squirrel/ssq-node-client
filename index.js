@@ -9,6 +9,7 @@ program
   .version(pkg.version)
   .option('--create-keypair', 'Generate a new keypair')
   .option('--create-user', 'Create a new user')
+  .option('--get-users', 'Lists users')
   .parse(process.argv)
 
 if(program.createKeypair) {
@@ -26,7 +27,10 @@ if(program.createKeypair) {
 
     squirrel.createUser(name, email)
   })
+} else if(program.getUsers) {
+  squirrel.getUsers()
 }
+
 else{
   program.help()
 }
