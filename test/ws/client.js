@@ -5,18 +5,18 @@ var testServer = require('../fixtures/server')
 describe('ws/client', function() {
   var port = 9999
   var uri = 'wss://localhost:' + port
-  var keypair
+  var keypair, wss
 
   before(function() {
-    testServer.listen(9999)
+    wss = testServer.listen(port)
     keypair = keyring.load('../fixtures/data')
   })
 
   it('connects to a secure websocket server', function(done) {
     var wsc = new WsClient(uri)
-    testServer.onConnection(function() {
+    wss.on('connection', function() {
       done()
-      testServer.close()
+      wss.close()
     })
     wsc.connect(keypair)
   })

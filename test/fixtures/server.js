@@ -22,18 +22,9 @@ function listen(port) {
   wss = new WebSocketServer({
     server: httpsServer
   })
-}
 
-function close() {
-  wss.close()
+  return wss
 }
-
-function onConnection(callback) {
-  wss.on('connection', callback)
-}
-
 module.exports = {
-  listen: listen,
-  close: close,
-  onConnection: onConnection
+  listen: listen
 }
