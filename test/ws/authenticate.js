@@ -18,7 +18,7 @@ describe('ws/authenticate', function() {
 
   it("signs a challenge request with a public key", function(done) {
     wss.on('connection', function(ws) {
-      ws.send(JSON.stringify(request('challenge', { message: 'example' })))
+      ws.send(JSON.stringify(request.notify('challenge', { message: 'example' })))
       ws.on('message', function(str) {
         var msg = JSON.parse(str)
         assert(keypair.publicKey.hashAndVerify(msg.params.algorithm, 'example', msg.params.signature, 'base64'), 'Hash and verify challenge response')

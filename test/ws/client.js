@@ -1,23 +1,51 @@
-var WsClient = require('../../lib/ws/client').WsClient
-var keyring = require('../../lib/keyring')
-var testServer = require('../fixtures/server')
+var WsClient = require('../../lib/ws/client').WsClient,
+    keyring = require('../../lib/keyring'),
+    request = require('../../lib/rpc/request'),
+    testServer = require('../fixtures/server')
 
 describe('ws/client', function() {
-  var port = 9999
-  var uri = 'wss://localhost:' + port
-  var keypair, wss
+  var port = 15000
+  var keypair, wss, wsc
 
   before(function() {
-    wss = testServer.listen(port)
     keypair = keyring.load('../fixtures/data')
   })
 
+  beforeEach(function() {
+    port += 1
+    wss = testServer.listen(port)
+
+    var uri = 'wss://localhost:' + port
+    wsc = new WsClient(uri)
+  })
+
+  afterEach(function() {
+    wss.close()
+  })
+
   it('connects to a secure websocket server', function(done) {
-    var wsc = new WsClient(uri)
     wss.on('connection', function() {
       done()
-      wss.close()
     })
+
     wsc.connect(keypair)
+  })
+
+  it('sends notify messages', function(done) {
+    wss.on('connection', function(ws) {
+      ws.send(JSON.stringify(request.notify('success')))
+
+      ws.on('message', function(str) {
+        var msg = JSON.parse(str)
+        if(msg.method === 'hello') {
+          assert.isUndefined(msg.id, 'Notify requests do not possess an id member')
+          done()
+        }
+      })
+    })
+
+    wsc.connect(keypair, function(err) {
+      wsc.notify('hello')
+    })
   })
 })
