@@ -1,6 +1,6 @@
 var authenticate = require('../../lib/ws/authenticate'),
     keyring = require('../../lib/keyring'),
-    request = require('../../lib/rpc/request'),
+    notify = require('../../lib/rpc/jsonrpc').notify,
     testServer = require('../fixtures/server'),
     keypair = require('../fixtures/keypair'),
     WebSocket = require('ws'),
@@ -18,7 +18,7 @@ describe('ws/authenticate', function() {
 
   it("signs a challenge request with a public key", function(done) {
     wss.on('connection', function(ws) {
-      ws.send(JSON.stringify(request.notify('challenge', { message: 'example' })))
+      ws.send(JSON.stringify(notify('challenge', { message: 'example' })))
       ws.on('message', function(str) {
         var msg = JSON.parse(str)
         assert(keypair.publicKey.hashAndVerify(msg.params.algorithm, 'example', msg.params.signature, 'base64'), 'Hash and verify challenge response')

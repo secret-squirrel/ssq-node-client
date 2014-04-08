@@ -1,6 +1,6 @@
 var WsClient = require('../../lib/ws/client').WsClient,
     keyring = require('../../lib/keyring'),
-    request = require('../../lib/rpc/request'),
+    notify = require('../../lib/rpc/jsonrpc').notify,
     testServer = require('../fixtures/server')
 
 describe('ws/client', function() {
@@ -16,7 +16,7 @@ describe('ws/client', function() {
     wss = testServer.listen(port)
 
     var uri = 'wss://localhost:' + port
-    wsc = new WsClient(uri)
+    wsc = WsClient(uri)
   })
 
   afterEach(function() {
@@ -33,7 +33,7 @@ describe('ws/client', function() {
 
   it('sends notify messages', function(done) {
     wss.on('connection', function(ws) {
-      ws.send(JSON.stringify(request.notify('success')))
+      ws.send(JSON.stringify(notify('success')))
 
       ws.on('message', function(str) {
         var msg = JSON.parse(str)
