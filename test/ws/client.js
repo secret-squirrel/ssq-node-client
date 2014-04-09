@@ -1,6 +1,7 @@
 var WsClient = require('../../lib/ws/client').WsClient,
     keyring = require('../../lib/keyring'),
     notify = require('../../lib/rpc/jsonrpc').notify,
+    dummyAuth = require('../fixtures/dummyAuthenticate'),
     testServer = require('../fixtures/server')
 
 describe('ws/client', function() {
@@ -16,7 +17,7 @@ describe('ws/client', function() {
     wss = testServer.listen(port)
 
     var uri = 'wss://localhost:' + port
-    wsc = WsClient(uri)
+    wsc = WsClient(uri, dummyAuth)
   })
 
   afterEach(function() {
@@ -24,17 +25,13 @@ describe('ws/client', function() {
   })
 
   it('connects to a secure websocket server', function(done) {
-    wss.on('connection', function() {
-      done()
+    wsc.connect(keypair, function() {
+      done()  
     })
-
-    wsc.connect(keypair)
   })
 
   it('sends notify messages', function(done) {
     wss.on('connection', function(ws) {
-      ws.send(JSON.stringify(notify('success')))
-
       ws.on('message', function(str) {
         var msg = JSON.parse(str)
         if(msg.method === 'hello') {
@@ -51,8 +48,6 @@ describe('ws/client', function() {
 
   it('sends request messages', function(done) {
     wss.on('connection', function(ws) {
-      ws.send(JSON.stringify(notify('success')))
-
       ws.on('message', function(str) {
         var msg = JSON.parse(str)
         if(msg.method === 'status') {
