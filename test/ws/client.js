@@ -48,4 +48,27 @@ describe('ws/client', function() {
       wsc.notify('hello')
     })
   })
+
+  it('sends request messages', function(done) {
+    wss.on('connection', function(ws) {
+      ws.send(JSON.stringify(notify('success')))
+
+      ws.on('message', function(str) {
+        var msg = JSON.parse(str)
+        if(msg.method === 'status') {
+          var response = { jsonrpc: '2.0',
+                           id: msg.id,
+                           result: 'All systems go' }
+          ws.send(JSON.stringify(response))
+        }
+      })
+    })
+
+    wsc.connect(keypair, function(err) {
+      wsc.request('status', null, function(err, response) {
+        assert.equal(response, 'All systems go') 
+        done()
+      })
+    })
+  })
 })
