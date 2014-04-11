@@ -28,9 +28,22 @@ if(program.createKeypair) {
     squirrel.createUser(name, email)
   })
 } else if(program.getUsers) {
-  squirrel.getUsers()
+  squirrel.getContext(getPassPhrase, function(err, context) {
+    squirrel.getUsers(context)
+  })
 }
 
 else{
   program.help()
+}
+
+function getPassPhrase(callback) {
+  var schema = {
+    properties: {
+      passPhrase: { hidden: true }
+    }
+  }
+  prompt.get(schema, function(err, result) {
+    callback(err, result.passPhrase)
+  })
 }
