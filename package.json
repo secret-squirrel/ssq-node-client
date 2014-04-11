@@ -15,7 +15,6 @@
     "url": "https://github.com/twg/secretsquirrel-cli/issues"
   },
   "dependencies": {
-    "yargs": "~1.2.1",
     "q": "~1.0.1",
     "ws": "~0.4.31",
     "ursa": "https://github.com/mmacaulay/ursa/tarball/master",
