@@ -11,7 +11,7 @@
              '--'-'
 ```
 
-# Secret Squirrel - Console client
+# Secret Squirrel Client
 
 ## Introduction
 
