@@ -15,7 +15,9 @@
 
 ## Introduction
 
-This project serves as a reference implementation for future Secret Squirrel clients. See the [server wiki](https://github.com/twg/secretsquirrel-server/wiki) for an architecture overview.
+This project is meant to be both a reusable client implementation (via npm ssq-client) and a feature-complete command-line interface.
+
+It also serves as a reference implementation for future Secret Squirrel clients. See the [server wiki](https://github.com/twg/secretsquirrel-server/wiki) for an architecture overview.
 
 Make sure to checkout the [server](https://github.com/twg/secretsquirrel-server) and [desktop](https://github.com/twg/secretsquirrel-desktop) clients.
 
