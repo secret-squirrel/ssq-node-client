@@ -25,10 +25,15 @@ describe('keyring', function() {
   it('saves keypairs to the config directory', function() {
     var keyPair = require('./fixtures/keypair')
     var configDir = path.join(process.cwd(), 'tmp/.squirrel')
+    var privateKey = path.join(configDir, 'private-key.asc')
+    var publicKey = path.join(configDir, 'public-key.asc')
+    if(fs.existsSync(privateKey)) fs.unlinkSync(privateKey)
+    if(fs.existsSync(publicKey)) fs.unlinkSync(publicKey)
 
-    keyring.saveToKeyRing(keyPair, configDir)
+    keyring.saveToKeyRing(keyPair, configDir, function() {
+      assert(fs.existsSync(privateKey), 'Saves private key to disk')
+      assert(fs.existsSync(publicKey), 'Saves public key to disk')
+    })
 
-    assert(fs.existsSync(path.join(configDir, 'private-key.asc')), 'Saves private key to disk')
-    assert(fs.existsSync(path.join(configDir, 'public-key.asc')), 'Saves public key to disk')
   })
 })
