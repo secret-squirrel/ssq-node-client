@@ -5,7 +5,7 @@ var keyring = require('../lib/keyring')
 
 var passPhrase = 's00pers3krit'
 var userId = 'test user <test@example.com>'
-var bits = 2048
+var bits = 512
 
 describe('keyring', function() {
 
