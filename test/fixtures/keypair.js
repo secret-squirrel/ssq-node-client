@@ -1,8 +1,17 @@
-var fs = require('fs'),
-    path = require('path'),
-    ursa = require('ursa')
+var fs = require('fs')
+var path = require('path')
+var openpgp = require('openpgp')
+
+var passPhrase = 's00pers3krit'
+
+function loadKey(fileName) {
+  var keyText = fs.readFileSync(path.join(__dirname, 'data/' + fileName)).toString()
+  return openpgp.key.readArmored(keyText).keys[0]
+}
 
 module.exports = {
-  privateKey: ursa.createPrivateKey(fs.readFileSync(path.join(__dirname, 'data/id_rsa'))),
-  publicKey: ursa.createPublicKey(fs.readFileSync(path.join(__dirname, 'data/id_rsa.pub')))
+  privateKey: loadKey('private-key.asc'),
+  publicKey: loadKey('public-key.asc')
 }
+
+module.exports.privateKey.decrypt(passPhrase)

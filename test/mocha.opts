@@ -1,3 +1,4 @@
 --require test/support/common
 --recursive
+--globals data
 -R spec
