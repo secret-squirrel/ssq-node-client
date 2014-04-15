@@ -5,18 +5,32 @@ var prompt = require('prompt')
 var pkg = require('./package.json')
 var squirrel = require('./lib/squirrel')
 
+prompt.message = prompt.delimiter = ''
+
 program.version(pkg.version)
 
 program
   .command('create-keypair')
   .description('Generate a new keypair')
   .action(function() {
-    // TODO: validation. bits should be at least 2048, and should default to
-    // that. passphrase should be of a certain length.
     var schema = {
       properties: {
-        bits: {},
-        passPhrase: { hidden: true }
+        bits: { 
+          minimum: 1024,
+          maximum: 4096,
+          default: 2048,
+          allowEmpty: false,
+          message: 'Keysize must be an integer between 1024 and 4096',
+          description: 'Enter a keysize: '
+        },
+        passPhrase: { 
+          hidden: true,
+          allowEmpty: false,
+          minLength: 8,
+          maxLength: 64,
+          message: 'Passphrase must be between 8 and 64 characters long',
+          description: 'Enter a passphrase: '
+        }
       }
     }
     prompt.get(schema, function(err, result) {
@@ -60,7 +74,7 @@ program.parse(process.argv)
 function getPassPhrase(callback) {
   var schema = {
     properties: {
-      passPhrase: { hidden: true }
+      passPhrase: { hidden: true, description: "Enter your passphrase: " }
     }
   }
   console.log('You must unlock your private key to perform this operation.')
