@@ -71,6 +71,10 @@ program
 program.command('*').action(program.help)
 program.parse(process.argv)
 
+if(process.argv.length <= 2) {
+  program.help()
+}
+
 function getPassPhrase(callback) {
   var schema = {
     properties: {
