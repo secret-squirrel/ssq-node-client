@@ -1,10 +1,11 @@
-var authenticate = require('../../lib/ws/authenticate'),
-    keyring = require('../../lib/keyring'),
-    notify = require('../../lib/rpc/jsonrpc').notify,
-    testServer = require('../fixtures/server'),
-    keypair = require('../fixtures/keypair'),
-    WebSocket = require('ws'),
-    path = require('path')
+var WebSocket = require('ws')
+var path = require('path')
+var openpgp = require('openpgp')
+var authenticate = require('../../lib/ws/authenticate')
+var keyring = require('../../lib/keyring')
+var notify = require('../../lib/rpc/jsonrpc').notify
+var testServer = require('../fixtures/server')
+var keypair = require('../fixtures/keypair')
 
 describe('ws/authenticate', function() {
   var port = 9998
@@ -21,8 +22,9 @@ describe('ws/authenticate', function() {
       ws.send(JSON.stringify(notify('challenge', { message: 'example' })))
       ws.on('message', function(str) {
         var msg = JSON.parse(str)
-        assert(keypair.publicKey.hashAndVerify(msg.params.algorithm, 'example', msg.params.signature, 'base64'), 'Hash and verify challenge response')
-        assert.equal(keypair.publicKey.toPublicSshFingerprint('base64'), msg.params.fingerprint)
+        var cleartextMesssage = openpgp.cleartext.readArmored(msg.params.signature)
+        assert(openpgp.verifyClearSignedMessage([keypair.publicKey], cleartextMesssage), 'Challenge response is not verified')
+        assert.equal(keypair.publicKey.primaryKey.fingerprint, msg.params.fingerprint)
         done()
       })
     })
