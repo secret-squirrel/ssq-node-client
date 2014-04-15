@@ -30,11 +30,14 @@ if(program.createKeypair) {
     })
   })
 } else if(program.createUser) {
-  prompt.get(['name', 'email'], function(err, result) {
-    var name = result.name
-    var email = result.email
-
-    squirrel.createUser(name, email)
+  squirrel.getContext(getPassPhrase, function(err, context) {
+    console.log('\nCreating a new user.')
+    prompt.get(['name', 'email'], function(err, result) {
+      var name = result.name
+      var email = result.email
+      if(err) throw err
+      squirrel.createUser(context, name, email)
+    })
   })
 } else if(program.getUsers) {
   squirrel.getContext(getPassPhrase, function(err, context) {
@@ -53,6 +56,7 @@ function getPassPhrase(callback) {
       passPhrase: { hidden: true }
     }
   }
+  console.log('You must unlock your private key to perform this operation.')
   prompt.get(schema, function(err, result) {
     callback(err, result.passPhrase)
   })
