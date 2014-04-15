@@ -49,7 +49,20 @@ program
   .action(function() {
     squirrel.getContext(getPassPhrase, function(err, context) {
       console.log('\nCreating a new user.')
-      prompt.get(['name', 'email'], function(err, result) {
+      var schema = {
+        properties: {
+          name: {
+            allowEmpty: false,
+            description: 'Enter a name: '
+          },
+          email: {
+            format: 'email',
+            allowEmpty: false,
+            description: 'Enter an email: '
+          }
+        }
+      }
+      prompt.get(schema, function(err, result) {
         var name = result.name
         var email = result.email
         if(err) throw err
