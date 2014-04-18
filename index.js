@@ -61,13 +61,40 @@ program
             description: 'Enter an email: '
           }
         }
+program
+  .command('delete-user')
+  .description('Delete a user')
+  .action(function() {
+    squirrel.getContext(getPassPhrase, function(err, context) {
+      if(err) {
+        console.log(err)
+      } else {
+        console.log('\nDeleting a user.')
+        var schema = {
+          properties: {
+            email: {
+              allowEmpty: false,
+              description: 'Enter the email of the user you wish to delete: '
+            }
+          }
+        }
+        prompt.get(schema, function(err, result) {
+          if(err) {
+            console.log(err)
+            context.client.close()
+          } else {
+            var email = result.email
+            squirrel.deleteUser(context, email, function(err) {
+              if(err) {
+                console.log(err)
+              } else {
+                console.log('User deleted.')
+              }
+              context.client.close()
+            })
+          }
+        })
       }
-      prompt.get(schema, function(err, result) {
-        var name = result.name
-        var email = result.email
-        if(err) throw err
-        squirrel.createUser(context, name, email)
-      })
     })
   })
 
@@ -76,8 +103,18 @@ program
   .description('Display a list of users in the system')
   .action(function() {
     squirrel.getContext(getPassPhrase, function(err, context) {
-      if(err) throw err
-      squirrel.getUsers(context)
+      if(err) {
+        console.log(err)
+      } else {
+        squirrel.getUsers(context, function(err, result) {
+          if(err) {
+            console.log(err)
+          } else {
+            console.log(result)
+          }
+          context.client.close()
+        })
+      }
     })
   })
 
