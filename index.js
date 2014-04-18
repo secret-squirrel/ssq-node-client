@@ -4,6 +4,7 @@ var program = require('commander')
 var prompt = require('prompt')
 var pkg = require('./package.json')
 var squirrel = require('./lib/squirrel')
+var session = require('./session')
 
 program
   .version(pkg.version)
@@ -43,17 +44,30 @@ if(program.createKeypair) {
   })
 }
 
-else{
+else {
   program.help()
 }
 
-function getPassPhrase(callback) {
+function promptForPassPhrase(callback) {
   var schema = {
     properties: {
       passPhrase: { hidden: true }
     }
   }
   prompt.get(schema, function(err, result) {
+    if (result.passPhrase) {
+      session.fork(result.passPhrase)
+    }
     callback(err, result.passPhrase)
+  })
+}
+
+function getPassPhrase(callback) {
+  session.getPassPhrase(function(err, passPhrase) {
+    if (err) {
+      promptForPassPhrase(callback)
+    } else {
+      callback(null, passPhrase)
+    }
   })
 }
