@@ -34,12 +34,19 @@ program
       }
     }
     prompt.get(schema, function(err, result) {
-      var bits = parseInt(result.bits)
-      var passPhrase = result.passPhrase
-      squirrel.createKeyPair(passPhrase, bits, function(err) {
-        if(err) throw err
-        console.log('Keypair saved.')
-      })
+      if(err) {
+        console.log(err)
+      } else {
+        var bits = parseInt(result.bits)
+        var passPhrase = result.passPhrase
+        squirrel.createKeyPair(passPhrase, bits, function(err) {
+          if(err) {
+            console.log(err)
+          } else {
+            console.log('Keypair saved.')
+          }
+        })
+      }
     })
   })
 
@@ -48,19 +55,45 @@ program
   .description('Create a new user')
   .action(function() {
     squirrel.getContext(getPassPhrase, function(err, context) {
-      console.log('\nCreating a new user.')
-      var schema = {
-        properties: {
-          name: {
-            allowEmpty: false,
-            description: 'Enter a name: '
-          },
-          email: {
-            format: 'email',
-            allowEmpty: false,
-            description: 'Enter an email: '
+      if(err) {
+        console.log(err)
+      } else { 
+        console.log('\nCreating a new user.')
+        var schema = {
+          properties: {
+            name: {
+              allowEmpty: false,
+              description: 'Enter a name: '
+            },
+            email: {
+              format: 'email',
+              allowEmpty: false,
+              description: 'Enter an email: '
+            }
           }
         }
+        prompt.get(schema, function(err, result) {
+          if(err) {
+            console.log(err)
+            context.client.close()
+          } else {
+            var name = result.name
+            var email = result.email
+            squirrel.createUser(context, name, email, function(err, user) {
+              if(err) {
+                console.log(err)
+              } else {
+                console.log('create-user completed successfully:')
+                console.log(result.result)
+              }
+              context.client.close()
+            })
+          }
+        })
+      }
+    })
+  })
+
 program
   .command('delete-user')
   .description('Delete a user')
