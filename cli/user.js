@@ -37,8 +37,8 @@ module.exports = function(program) {
                 if(err) {
                   console.log(err)
                 } else {
-                  console.log('create-user completed successfully:')
-                  console.log(result.result)
+                  console.log('User created:')
+                  console.log(user)
                 }
                 context.client.close()
               })
