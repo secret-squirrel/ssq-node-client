@@ -1,0 +1,118 @@
+var prompt = require('prompt')
+prompt.message = prompt.delimiter = ''
+var squirrel = require('../lib/squirrel')
+
+module.exports = function(program) {
+  program
+    .command('create-user')
+    .description('Create a new user')
+    .action(function() {
+      squirrel.getContext(getPassPhrase, function(err, context) {
+        if(err) {
+          console.log(err)
+        } else { 
+          console.log('\nCreating a new user.')
+          var schema = {
+            properties: {
+              name: {
+                allowEmpty: false,
+                description: 'Enter a name: '
+              },
+              email: {
+                format: 'email',
+                allowEmpty: false,
+                description: 'Enter an email: '
+              }
+            }
+          }
+          prompt.get(schema, function(err, result) {
+            if(err) {
+              console.log(err)
+              context.client.close()
+            } else {
+              var name = result.name
+              var email = result.email
+              squirrel.createUser(context, name, email, function(err, user) {
+                if(err) {
+                  console.log(err)
+                } else {
+                  console.log('create-user completed successfully:')
+                  console.log(result.result)
+                }
+                context.client.close()
+              })
+            }
+          })
+        }
+      })
+    })
+
+  program
+    .command('delete-user')
+    .description('Delete a user')
+    .action(function() {
+      squirrel.getContext(getPassPhrase, function(err, context) {
+        if(err) {
+          console.log(err)
+        } else {
+          console.log('\nDeleting a user.')
+          var schema = {
+            properties: {
+              email: {
+                allowEmpty: false,
+                description: 'Enter the email of the user you wish to delete: '
+              }
+            }
+          }
+          prompt.get(schema, function(err, result) {
+            if(err) {
+              console.log(err)
+              context.client.close()
+            } else {
+              var email = result.email
+              squirrel.deleteUser(context, email, function(err) {
+                if(err) {
+                  console.log(err)
+                } else {
+                  console.log('User deleted.')
+                }
+                context.client.close()
+              })
+            }
+          })
+        }
+      })
+    })
+
+  program
+    .command('list-users')
+    .description('Display a list of users in the system')
+    .action(function() {
+      squirrel.getContext(getPassPhrase, function(err, context) {
+        if(err) {
+          console.log(err)
+        } else {
+          squirrel.getUsers(context, function(err, result) {
+            if(err) {
+              console.log(err)
+            } else {
+              console.log(result)
+            }
+            context.client.close()
+          })
+        }
+      })
+    })
+}
+
+function getPassPhrase(callback) {
+  var schema = {
+    properties: {
+      passPhrase: { hidden: true, description: "Enter your passphrase: " }
+    }
+  }
+  console.log('You must unlock your private key to perform this operation.')
+  prompt.get(schema, function(err, result) {
+    callback(err, result.passPhrase)
+  })
+}
