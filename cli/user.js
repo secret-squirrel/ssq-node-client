@@ -1,6 +1,7 @@
 var prompt = require('prompt')
 prompt.message = prompt.delimiter = ''
 var squirrel = require('../lib/squirrel')
+var User = squirrel.User
 
 module.exports = function(program) {
   program
@@ -32,7 +33,7 @@ module.exports = function(program) {
             } else {
               var name = result.name
               var email = result.email
-              squirrel.createUser(context, name, email, function(err, user) {
+              User.create(context, name, email, function(err, user) {
                 if(err) {
                   console.log(err)
                 } else {
@@ -70,13 +71,27 @@ module.exports = function(program) {
               context.client.close()
             } else {
               var email = result.email
-              squirrel.deleteUser(context, email, function(err) {
+              User.index(context, { where: { email: email } }, function(err, result) {
                 if(err) {
-                  console.log(err)
+                  callback(err)
+                  context.client.close()
                 } else {
-                  console.log('User deleted.')
+                  if(result && result.length > 0) {
+                    console.log('Deleting:')
+                    console.log(result[0])
+                    User.del(context, result[0].id, function(err) {
+                      if(err) {
+                        console.log(err)
+                      } else {
+                        console.log('User deleted.')
+                      }
+                      context.client.close()
+                    })
+                  } else {
+                    callback('User not found.')
+                    context.client.close()
+                  }
                 }
-                context.client.close()
               })
             }
           })
@@ -92,7 +107,7 @@ module.exports = function(program) {
         if(err) {
           console.log(err)
         } else {
-          squirrel.getUsers(context, function(err, result) {
+          User.index(context, {}, function(err, result) {
             if(err) {
               console.log(err)
             } else {
