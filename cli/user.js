@@ -88,7 +88,7 @@ module.exports = function(program) {
                       context.client.close()
                     })
                   } else {
-                    callback('User not found.')
+                    console.log('User not found.')
                     context.client.close()
                   }
                 }
