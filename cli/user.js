@@ -49,6 +49,50 @@ module.exports = function(program) {
     })
 
   program
+    .command('update-user')
+    .description('Update your profile')
+    .action(function() {
+      squirrel.getContext(getPassPhrase, function(err, context) {
+        if(err) {
+          console.log(err)
+        } else { 
+          var schema = {
+            properties: {
+              name: {
+                allowEmpty: false,
+                description: 'Enter a name: '
+              },
+              email: {
+                format: 'email',
+                allowEmpty: false,
+                description: 'Enter an email: '
+              }
+            }
+          }
+          prompt.get(schema, function(err, result) {
+            if(err) {
+              console.log(err)
+              context.client.close()
+            } else {
+              var user = context.user
+              user.name = result.name
+              user.email = result.email
+              User.update(context, user, function(err, user) {
+                if(err) {
+                  console.log(err)
+                } else {
+                  console.log('User updated:')
+                  console.log(user)
+                }
+                context.client.close()
+              })
+            }
+          })
+        }
+      })
+    })
+
+  program
     .command('delete-user')
     .description('Delete a user')
     .action(function() {
