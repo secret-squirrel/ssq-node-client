@@ -33,7 +33,7 @@ module.exports = function(program) {
             } else {
               var name = result.name
               var email = result.email
-              User.create(context, name, email, function(err, user) {
+              User.create(context, { name: name, email: email }, function(err, user) {
                 if(err) {
                   console.log(err)
                 } else {
