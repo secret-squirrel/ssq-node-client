@@ -1,7 +1,7 @@
 var prompt = require('prompt')
 prompt.message = prompt.delimiter = ''
 
-var config = require('config')
+var config = require('../config')
 var Keyring = require('../lib/squirrel').Keyring
 
 var userConfigDir = config.userConfigDir
