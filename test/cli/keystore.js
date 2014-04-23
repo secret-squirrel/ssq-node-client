@@ -45,4 +45,13 @@ describe('keystore', function() {
       done()
     })
   })
+
+  it('loads public keys', function(done) {
+    keystore.storePublic([publicKey], function(err) {
+      keystore.loadPublic(function(err, keys) {
+        assert.include(keys, publicKey, 'Loaded public key')
+        done()
+      })
+    })
+  })
 })
