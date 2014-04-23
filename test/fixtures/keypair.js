@@ -9,9 +9,8 @@ function loadKey(fileName) {
   return openpgp.key.readArmored(keyText).keys[0]
 }
 
-module.exports = {
-  privateKey: loadKey('private-key.asc'),
+module.exports =  {
+  privateKeyEncrypted: loadKey('private-key.asc'),
+  privateKey: loadKey('private-key.asc').decrypt(passPhrase),
   publicKey: loadKey('public-key.asc')
 }
-
-module.exports.privateKey.decrypt(passPhrase)
