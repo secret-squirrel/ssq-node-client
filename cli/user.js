@@ -6,6 +6,8 @@ var User = squirrel.User
 
 prompt.message = prompt.delimiter = ''
 
+var tableColumns = ['id', 'name', 'email', 'isAdmin']
+
 module.exports = function(program) {
   program
     .command('create-user')
@@ -41,7 +43,7 @@ module.exports = function(program) {
                   console.log(err)
                 } else {
                   console.log('User created:')
-                  console.log(user)
+                  console.log(tableizeRecords([user], tableColumns))
                 }
                 context.client.close()
               })
@@ -85,7 +87,8 @@ module.exports = function(program) {
                   console.log(err)
                 } else {
                   console.log('User updated:')
-                  console.log(user)
+                  console.log(tableizeRecords([user], tableColumns))
+
                 }
                 context.client.close()
               })
@@ -125,7 +128,8 @@ module.exports = function(program) {
                 } else {
                   if(result && result.length > 0) {
                     console.log('Deleting:')
-                    console.log(result[0])
+                    console.log(tableizeRecords(result, tableColumns))
+
                     User.del(context, result[0].id, function(err) {
                       if(err) {
                         console.log(err)
@@ -158,7 +162,7 @@ module.exports = function(program) {
             if(err) {
               console.log(err)
             } else {
-              console.log(tableizeRecords(result, ['id', 'email', 'name', 'isAdmin']))
+              console.log(tableizeRecords(result, tableColumns))
             }
             context.client.close()
           })

@@ -6,7 +6,7 @@ function tableizeRecords(records, fields, fieldLabels) {
   fieldLabels.unshift('#')
 
   fields.forEach(function(field, i) {
-    fieldLabels[i] = fieldLabels[i] || fields[i]
+    fieldLabels[i + 1] = fieldLabels[i + 1] || fields[i]
   })
 
   var table = new Table({ head: fieldLabels })
