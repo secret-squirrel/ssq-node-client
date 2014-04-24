@@ -8,12 +8,12 @@ var userConfigDir = config.userConfigDir
 
 module.exports = function(program) {
   program
-    .command('create-keypair')
+    .command('keypair-create')
     .description('Generate a new keypair')
     .action(function() {
       var schema = {
         properties: {
-          bits: { 
+          bits: {
             minimum: 1024,
             maximum: 4096,
             default: 2048,
@@ -21,7 +21,7 @@ module.exports = function(program) {
             message: 'Keysize must be an integer between 1024 and 4096',
             description: 'Enter a keysize: '
           },
-          passPhrase: { 
+          passPhrase: {
             hidden: true,
             allowEmpty: false,
             minLength: 8,

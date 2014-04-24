@@ -15,7 +15,7 @@ function tableizeRecords(records, fields, fieldLabels) {
     var entry = [i]
 
     fields.forEach(function (field, i) {
-      entry.push(record[field])
+      entry.push(record[field] || '')
     })
 
     table.push(entry)

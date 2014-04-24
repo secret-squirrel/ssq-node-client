@@ -8,7 +8,7 @@ prompt.message = prompt.delimiter = ''
 
 program.version(pkg.version)
 
-var modules = ['keyring', 'user']
+var modules = ['keyring', 'user', 'login']
 modules.forEach(function(module) {
   require('./cli/' + module)(program)
 })

@@ -1,6 +1,6 @@
-var modelName = 'user'
-var model = require('../lib/squirrel').User
-var tableColumns = ['id', 'name', 'email', 'isAdmin']
+var modelName = 'login'
+var model = require('../lib/squirrel').Login
+var tableColumns = ['id', 'name', 'url', 'notes']
 var crud = require('./helpers/crud')(model, modelName, tableColumns)
 
 function create() {
@@ -8,12 +8,15 @@ function create() {
     properties: {
       name: {
         allowEmpty: false,
-        description: 'Enter a name: '
+        description: 'Enter a name for the new ' + modelName + ':'
       },
-      email: {
-        format: 'email',
+      url: {
         allowEmpty: false,
-        description: 'Enter an email: '
+        description: 'Enter a url: '
+      },
+      notes: {
+        allowEmpty: false,
+        description: 'Enter a description: '
       }
     }
   })
@@ -35,14 +38,18 @@ function update() {
         allowEmpty: false,
         description: 'Enter an updated name for this ' + modelName + ': '
       },
-      email: {
-        format: 'email',
+      url: {
+        format: 'url',
         allowEmpty: false,
-        description: 'Enter an updated email: '
+        description: 'Enter an updated url: '
+      },
+      notes: {
+        description: 'Enter an updated description: '
       }
     }
   })
 }
+
 
 function del() {
   crud.del({
