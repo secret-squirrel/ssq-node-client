@@ -22,7 +22,8 @@
     "async": "~0.6.2",
     "prompt": "~0.2.12",
     "config": "~0.4.35",
-    "openpgp": "~0.5.1"
+    "openpgp": "~0.5.1",
+    "cli-table": "~0.3.0"
   },
   "devDependencies": {
     "mocha": "~1.18.2",

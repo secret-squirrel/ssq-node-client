@@ -1,7 +1,10 @@
 var prompt = require('prompt')
-prompt.message = prompt.delimiter = ''
 var squirrel = require('../lib/squirrel')
+var tableizeRecords = require('./helpers/tableizer').tableizeRecords
+
 var User = squirrel.User
+
+prompt.message = prompt.delimiter = ''
 
 module.exports = function(program) {
   program
@@ -11,7 +14,7 @@ module.exports = function(program) {
       squirrel.getContext(getPassPhrase, function(err, context) {
         if(err) {
           console.log(err)
-        } else { 
+        } else {
           console.log('\nCreating a new user.')
           var schema = {
             properties: {
@@ -55,7 +58,7 @@ module.exports = function(program) {
       squirrel.getContext(getPassPhrase, function(err, context) {
         if(err) {
           console.log(err)
-        } else { 
+        } else {
           var schema = {
             properties: {
               name: {
@@ -155,7 +158,7 @@ module.exports = function(program) {
             if(err) {
               console.log(err)
             } else {
-              console.log(result)
+              console.log(tableizeRecords(result, ['id', 'email', 'name', 'isAdmin']))
             }
             context.client.close()
           })
@@ -165,6 +168,13 @@ module.exports = function(program) {
 }
 
 function getPassPhrase(callback) {
+  var envPassPhrase = process.env.SSQ_CLIENT_PASSPHRASE
+
+  if (envPassPhrase) {
+    callback(null, envPassPhrase)
+    return
+  }
+
   var schema = {
     properties: {
       passPhrase: { hidden: true, description: "Enter your passphrase: " }
