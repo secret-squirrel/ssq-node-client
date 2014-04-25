@@ -23,7 +23,8 @@
     "prompt": "~0.2.12",
     "openpgp": "~0.5.1",
     "fs.extra": "~1.2.1",
-    "cli-table": "~0.3.0"
+    "cli-table": "~0.3.0",
+    "array.prototype.find": "~0.1.1"
   },
   "devDependencies": {
     "mocha": "~1.18.2",
