@@ -6,6 +6,7 @@ module.exports = function(config) {
   var configDir = config.userConfigDir
   var pubring = 'pubring.json'
   var secring = 'secring.json'
+  var userConfig = 'config.json'
 
   function loadKeys(file, callback) {
     fs.readFile(file, function(err, data) {
@@ -35,6 +36,26 @@ module.exports = function(config) {
     fs.writeFile(file, JSON.stringify(armoredKeys), fileOptions, callback)
   }
 
+  function loadUserConfig(callback) {
+    var file = path.join(configDir, userConfig)
+    fs.readFile(file, function(err, data) {
+      if(err) {
+        if(err.code === 'ENOENT') {
+          callback(null, {})
+        } else {
+          callback(err)
+        }
+      } else {
+        callback(null, JSON.parse(data))
+      }
+    })
+  }
+
+  function storeUserConfig(config, fileOptions, callback) {
+    var file = path.join(configDir, userConfig)
+    fs.writeFile(file, JSON.stringify(config), fileOptions, callback)
+  }
+
   return {
     loadPublic: function (callback) {
       loadKeys(path.join(configDir, pubring), callback)
@@ -47,6 +68,8 @@ module.exports = function(config) {
     },
     storePrivate: function(keys, callback) {
       storeKeys(path.join(configDir, secring), keys, { mode: 384 }, callback)
-    }
+    },
+    loadUserConfig: loadUserConfig,
+    storeUserConfig: storeUserConfig
   }
 }
