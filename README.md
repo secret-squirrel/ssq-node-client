@@ -33,11 +33,11 @@ Get the [server](https://github.com/twg/secretsquirrel-server) up and running.
 
 So far you can generate a new keypair:
 
-`node squirrel.js create-keypair`
+`node squirrel.js keypair-create`
 
 And create a user:
 
-`node squirrel.js create-user --firstName Matt --lastName MacAulay --email mac@twg.ca`
+`node squirrel.js user-create --firstName Matt --lastName MacAulay --email mac@twg.ca`
 
 
 ## Tests
