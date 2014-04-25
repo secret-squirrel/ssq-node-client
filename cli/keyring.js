@@ -2,9 +2,8 @@ var prompt = require('prompt')
 prompt.message = prompt.delimiter = ''
 
 var config = require('../config')
-var Keyring = require('../lib/squirrel').Keyring
-
-var userConfigDir = config.userConfigDir
+var keystore = require('./keystore')(config)
+var keyring = require('../lib/squirrel').Keyring(keystore)
 
 module.exports = function(program) {
   program
@@ -38,10 +37,8 @@ module.exports = function(program) {
           var bits = parseInt(result.bits)
           var passPhrase = result.passPhrase
 
-          var keyPair = keyring.createKeyPair(passPhrase, '', bits)
-          keyring.saveToKeyRing(keyPair, userConfigDir)
-
-          squirrel.createKeyPair(passPhrase, bits, function(err) {
+          keyring.createKeyPair(passPhrase, '', bits)
+          keyring.store(function(err) {
             if(err) {
               console.log(err)
             } else {

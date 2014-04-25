@@ -1,13 +1,13 @@
 var prompt = require('prompt')
 var squirrel = require('../../lib/squirrel')
 var tableizeRecords = require('./tableizer').tableizeRecords
-var passPhrasePrompt = require('./passphrase-prompt')
+var loadKeyring = require('./load-keyring')
 
 prompt.message = prompt.delimiter = ''
 
 module.exports = function(model, modelName, tableColumns) {
   function create(schema) {
-    squirrel.getContext(passPhrasePrompt, function(err, context) {
+    squirrel.getContext(loadKeyring, function(err, context) {
       if(err) {
         console.log(err)
       } else {
@@ -33,7 +33,7 @@ module.exports = function(model, modelName, tableColumns) {
   }
 
   function list(schema) {
-    squirrel.getContext(passPhrasePrompt, function(err, context) {
+    squirrel.getContext(loadKeyring, function(err, context) {
       if(err) {
         console.log(err)
       } else {
@@ -50,7 +50,7 @@ module.exports = function(model, modelName, tableColumns) {
   }
 
   function update(schema) {
-    squirrel.getContext(passPhrasePrompt, function(err, context) {
+    squirrel.getContext(loadKeyring, function(err, context) {
       if(err) {
         console.log(err)
       } else {
@@ -76,7 +76,7 @@ module.exports = function(model, modelName, tableColumns) {
   }
 
   function del(schema) {
-    squirrel.getContext(passPhrasePrompt, function(err, context) {
+    squirrel.getContext(loadKeyring, function(err, context) {
       if(err) {
         console.log(err)
       } else {
