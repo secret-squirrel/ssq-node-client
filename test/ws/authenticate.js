@@ -11,6 +11,7 @@ describe('ws/authenticate', function() {
   var port = 9998
   var uri = 'wss://localhost:' + port
   var ws, wss
+  var privateKey = keypair.privateKey
 
   before(function() {
     wss = testServer.listen(port)
@@ -28,6 +29,6 @@ describe('ws/authenticate', function() {
         done()
       })
     })
-    authenticate(keypair, ws, function(err){})
+    authenticate(privateKey, ws, function(err){})
   })
 })

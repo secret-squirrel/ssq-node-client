@@ -1,16 +1,14 @@
-var WsClient = require('../../lib/ws/client').WsClient,
-    keyring = require('../../lib/keyring'),
-    notify = require('../../lib/rpc/jsonrpc').notify,
-    dummyAuth = require('../fixtures/dummyAuthenticate'),
-    testServer = require('../fixtures/server')
+var WsClient = require('../../lib/ws/client').WsClient
+var keyring = require('../../lib/keyring')
+var notify = require('../../lib/rpc/jsonrpc').notify
+var dummyAuth = require('../fixtures/dummyAuthenticate')
+var testServer = require('../fixtures/server')
+var keypair = require('../fixtures/keypair')
 
 describe('ws/client', function() {
   var port = 15000
-  var keypair, wss, wsc
-
-  before(function() {
-    keypair = keyring.load('../fixtures/data')
-  })
+  var wss, wsc
+  var privateKey = keypair.privateKey
 
   beforeEach(function() {
     port += 1
@@ -25,7 +23,7 @@ describe('ws/client', function() {
   })
 
   it('connects to a secure websocket server', function(done) {
-    wsc.connect(keypair, function() {
+    wsc.connect(privateKey, function() {
       done()  
     })
   })

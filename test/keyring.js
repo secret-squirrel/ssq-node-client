@@ -50,7 +50,7 @@ describe('keyring', function() {
     keyring.store(function(err) {
       assert.notOk(err)
       var newKeyring = require('../lib/keyring')(keystore)
-      newKeyring.load(function(err) {
+      newKeyring.load(passPhrase, function(err) {
         assert.notOk(err)
         assert.equal(newKeyring.publicKeys().length, 1)
         assert.equal(newKeyring.privateKeys().length, 1)
