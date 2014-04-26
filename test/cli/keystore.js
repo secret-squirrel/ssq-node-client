@@ -6,8 +6,8 @@ describe('keystore', function() {
   var config = {
       userConfigDir: path.join(__dirname, '../../tmp/config')
     }
-  var privateKey = keypair.privateKeyEncrypted
-  var publicKey = keypair.publicKey
+  var privateKeyData = JSON.stringify([keypair.privateKeyEncrypted.armor()])
+  var publicKeyData = JSON.stringify([keypair.publicKey.armor()])
   var keystore
 
   before(function() {
@@ -19,27 +19,28 @@ describe('keystore', function() {
     fs.mkdirpSync(config.userConfigDir)
   })
 
-  it('stores private keys', function(done) {
-    keystore.storePrivate([privateKey], function(err) {
-      assert.notOk(err, 'Failed to store private key: ' + err)
+  it('stores private key data', function(done) {
+    keystore.storePrivate(privateKeyData, function(err) {
+      assert.notOk(err, 'Failed to store private key data: ' + err)
 
       assert(fs.existsSync(path.join(config.userConfigDir, 'secring.json'), 'Saves private key to disk'))
       done()
     })
   })
 
-  it('loads private keys', function(done) {
-    keystore.storePrivate([privateKey], function(err) {
-      keystore.loadPrivate(function(err, keys) {
-        assert.include(keys, privateKey, 'Loaded private key')
+  it('loads private key data', function(done) {
+    keystore.storePrivate(privateKeyData, function(err) {
+      keystore.loadPrivate(function(err, keyData) {
+        assert.notOk(err, 'Failed to load private key data: ' + err)
+        assert.equal(keyData, privateKeyData, 'Load private key data')
         done()
       })
     })
   })
 
   it('stores public keys', function(done) {
-    keystore.storePublic([publicKey], function(err) {
-      assert.notOk(err, 'Failed to store public key: ' + err)
+    keystore.storePublic(publicKeyData, function(err) {
+      assert.notOk(err, 'Failed to store public key data: ' + err)
 
       assert(fs.existsSync(path.join(config.userConfigDir, 'pubring.json'), 'Saves public key to disk'))
       done()
@@ -47,9 +48,10 @@ describe('keystore', function() {
   })
 
   it('loads public keys', function(done) {
-    keystore.storePublic([publicKey], function(err) {
-      keystore.loadPublic(function(err, keys) {
-        assert.include(keys, publicKey, 'Loaded public key')
+    keystore.storePublic(publicKeyData, function(err) {
+      keystore.loadPublic(function(err, keyData) {
+        assert.notOk(err, 'Failed to store public key data: ' + err)
+        assert.equal(keyData, publicKeyData, 'Load public key data')
         done()
       })
     })
