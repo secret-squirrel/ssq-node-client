@@ -1,9 +1,13 @@
+var async = require('async')
 var prompt = require('prompt')
 prompt.message = prompt.delimiter = ''
 
+var publicKey = require('../lib/squirrel').PublicKey
 var config = require('../config')
 var keystore = require('./keystore')(config)
-var keyring = require('../lib/squirrel').Keyring(keystore)
+var loadKeyring = require('./helpers/load-keyring')
+var squirrel = require('../lib/squirrel')
+var keyring = squirrel.Keyring(keystore)
 
 function create() {
   var schema = {
@@ -35,7 +39,23 @@ function create() {
       var passPhrase = result.passPhrase
 
       keyring.createKeyPair(passPhrase, '', bits)
-      keyring.store(function(err) {
+      async.waterfall([
+        function(cb) {
+          squirrel.getContext(loadKeyring, cb)
+        },
+        function(context, cb) {
+          var publicKey = keyring.defaultKey().toPublic()
+          var publicKeyData = {
+            userId: context.user.id,
+            fingerprint: publicKey.primaryKey.fingerprint,
+            publicKey: publicKey.armor()
+          }
+          publicKey.create(context, publicKeyData, cb)
+        },
+        function(result, cb) {
+          keyring.store(cb)
+        }
+      ], function(err) {
         if(err) {
           console.log(err)
         } else {
