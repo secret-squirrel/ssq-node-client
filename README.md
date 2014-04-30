@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/secret-squirrel/ssq-node-client.svg?branch=develop)](https://travis-ci.org/secret-squirrel/ssq-node-client)
+
 ```
          _.-"""-,
        .'  ..::. `\
