@@ -2,7 +2,7 @@ var async = require('async')
 var prompt = require('prompt')
 prompt.message = prompt.delimiter = ''
 
-var publicKey = require('../lib/squirrel').PublicKey
+var PublicKey = require('../lib/squirrel').PublicKey
 var config = require('../config')
 var keystore = require('./keystore')(config)
 var loadKeyring = require('./helpers/load-keyring')
@@ -50,7 +50,7 @@ function create() {
             fingerprint: publicKey.primaryKey.fingerprint,
             publicKey: publicKey.armor()
           }
-          publicKey.create(context, publicKeyData, cb)
+          PublicKey.create(context, publicKeyData, cb)
         },
         function(result, cb) {
           keyring.store(cb)
@@ -61,7 +61,8 @@ function create() {
         } else {
           var publicKey = keyring.defaultKey().toPublic()
           console.log('Keypair saved.')
-          console.log('Public key', publicKey.primaryKey.fingerprint, ':\n\n', publicKey.armor())
+          console.log('Public key [' + publicKey.primaryKey.fingerprint + ']:\n\n', publicKey.armor())
+          process.exit()
         }
       })
     }
