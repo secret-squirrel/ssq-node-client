@@ -44,13 +44,7 @@ function create() {
           squirrel.getContext(loadKeyring, cb)
         },
         function(context, cb) {
-          var publicKey = keyring.defaultKey().toPublic()
-          var publicKeyData = {
-            userId: context.user.id,
-            fingerprint: publicKey.primaryKey.fingerprint,
-            publicKey: publicKey.armor()
-          }
-          PublicKey.create(context, publicKeyData, cb)
+          createKey(context, cb)
         },
         function(result, cb) {
           keyring.store(cb)
@@ -67,6 +61,16 @@ function create() {
       })
     }
   })
+}
+
+function createKey(context, callback) {
+  var publicKey = keyring.defaultKey().toPublic()
+  var publicKeyData = {
+    userId: context.user.id,
+    fingerprint: publicKey.primaryKey.fingerprint,
+    publicKey: publicKey.armor()
+  }
+  PublicKey.create(context, publicKeyData, callback)
 }
 
 module.exports = function(program) {
