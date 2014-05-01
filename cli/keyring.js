@@ -1,16 +1,33 @@
 var async = require('async')
+var Q = require('Q')
 var prompt = require('prompt')
 prompt.message = prompt.delimiter = ''
 
-var PublicKey = require('../lib/squirrel').PublicKey
+var squirrel = require('../lib/squirrel')
+var PublicKey = squirrel.PublicKey
 var config = require('../config')
 var keystore = require('./keystore')(config)
+var Keyring = squirrel.Keyring(keystore)
 var loadKeyring = require('./helpers/load-keyring')
-var squirrel = require('../lib/squirrel')
-var keyring = squirrel.Keyring(keystore)
+
+var promptGet = Q.nfbind(prompt.get)
+var sqGetContext = Q.nfbind(squirrel.getContext)
+var sqPublicKeyCreate = Q.nfbind(PublicKey.create)
+var sqKeyringStore = Q.nfbind(Keyring.store)
 
 function create() {
-  var schema = {
+  promptGet(schema())
+  .then(generateKeypair)
+  .then(getContext)
+  .then(createPublicKey)
+  .then(keyringStore)
+  .then(handleSuccess)
+  .catch(handleError)
+  .done(process.exit)
+}
+
+function schema() {
+  return {
     properties: {
       bits: {
         minimum: 1024,
@@ -30,47 +47,41 @@ function create() {
       }
     }
   }
-
-  prompt.get(schema, function(err, result) {
-    if(err) {
-      console.log(err)
-    } else {
-      var bits = parseInt(result.bits)
-      var passPhrase = result.passPhrase
-
-      keyring.createKeyPair(passPhrase, '', bits)
-      async.waterfall([
-        function(cb) {
-          squirrel.getContext(loadKeyring, cb)
-        },
-        function(context, cb) {
-          createKey(context, cb)
-        },
-        function(result, cb) {
-          keyring.store(cb)
-        }
-      ], function(err) {
-        if(err) {
-          console.log(err)
-        } else {
-          var publicKey = keyring.defaultKey().toPublic()
-          console.log('Keypair saved.')
-          console.log('Public key [' + publicKey.primaryKey.fingerprint + ']:\n\n', publicKey.armor())
-          process.exit()
-        }
-      })
-    }
-  })
 }
 
-function createKey(context, callback) {
-  var publicKey = keyring.defaultKey().toPublic()
+function generateKeypair(result) {
+  var bits = parseInt(result.bits)
+  var passPhrase = result.passPhrase
+
+  return Keyring.createKeyPair(passPhrase, '', bits)
+}
+
+function getContext() {
+  return sqGetContext(loadKeyring)
+}
+
+function createPublicKey(context) {
+  var publicKey = Keyring.defaultKey().toPublic()
   var publicKeyData = {
     userId: context.user.id,
     fingerprint: publicKey.primaryKey.fingerprint,
     publicKey: publicKey.armor()
   }
-  PublicKey.create(context, publicKeyData, callback)
+  return sqPublicKeyCreate(context, publicKeyData)
+}
+
+function keyringStore() {
+  return sqKeyringStore()
+}
+
+function handleError(error) {
+  console.log('Error:', error)
+}
+
+function handleSuccess() {
+  var publicKey = Keyring.defaultKey().toPublic()
+  console.log('Keypair saved.')
+  console.log('Public key [' + publicKey.primaryKey.fingerprint + ']:\n\n', publicKey.armor())
 }
 
 module.exports = function(program) {
