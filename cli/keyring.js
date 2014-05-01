@@ -13,14 +13,13 @@ var loadKeyring = require('./helpers/load-keyring')
 var promptGet = Q.nfbind(prompt.get)
 var sqGetContext = Q.nfbind(squirrel.getContext)
 var sqPublicKeyCreate = Q.nfbind(PublicKey.create)
-var sqKeyringStore = Q.nfbind(Keyring.store)
 
 function create() {
   promptGet(schema())
   .then(generateKeypair)
   .then(getContext)
   .then(createPublicKey)
-  .then(keyringStore)
+  .then(Keyring.store)
   .then(handleSuccess)
   .catch(handleError)
   .done(process.exit)
@@ -68,10 +67,6 @@ function createPublicKey(context) {
     publicKey: publicKey.armor()
   }
   return sqPublicKeyCreate(context, publicKeyData)
-}
-
-function keyringStore() {
-  return sqKeyringStore()
 }
 
 function handleError(error) {

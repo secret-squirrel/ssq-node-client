@@ -1,5 +1,9 @@
+var Q = require('Q')
 var path = require('path')
 var fs = require('fs')
+
+var readFile = Q.nfbind(fs.readFile)
+var writeFile = Q.nfbind(fs.writeFile)
 
 module.exports = function(config) {
   var configDir = config.userConfigDir
@@ -7,38 +11,36 @@ module.exports = function(config) {
   var secring = 'secring.json'
   var userConfig = 'config.json'
 
-  function loadUserConfig(callback) {
+  function loadUserConfig() {
     var file = path.join(configDir, userConfig)
-    fs.readFile(file, function(err, data) {
-      if(err) {
-        if(err.code === 'ENOENT') {
-          callback(null, {})
-        } else {
-          callback(err)
-        }
+    return readFile(file)
+    .then(JSON.parse)
+    .catch(function(error) {
+      if(error.code === 'ENOENT') {
+        return {}
       } else {
-        callback(null, JSON.parse(data))
+        throw error
       }
     })
   }
 
-  function storeUserConfig(config, fileOptions, callback) {
+  function storeUserConfig(config, fileOptions) {
     var file = path.join(configDir, userConfig)
-    fs.writeFile(file, JSON.stringify(config), fileOptions, callback)
+    return writeFile(file, JSON.stringify(config), fileOptions)
   }
 
   return {
-    loadPublic: function (callback) {
-      fs.readFile(path.join(configDir, pubring), callback)
+    loadPublic: function () {
+      return readFile(path.join(configDir, pubring))
     },
-    loadPrivate: function (callback) {
-      fs.readFile(path.join(configDir, secring), callback)
+    loadPrivate: function () {
+      return readFile(path.join(configDir, secring))
     },
-    storePublic: function (data, callback) {
-      fs.writeFile(path.join(configDir, pubring), data, null, callback)
+    storePublic: function (data) {
+      return writeFile(path.join(configDir, pubring), data, null)
     },
-    storePrivate: function(data, callback) {
-      fs.writeFile(path.join(configDir, secring), data, { mode: 384 }, callback)
+    storePrivate: function(data) {
+      return writeFile(path.join(configDir, secring), data, { mode: 384 })
     },
     loadUserConfig: loadUserConfig,
     storeUserConfig: storeUserConfig

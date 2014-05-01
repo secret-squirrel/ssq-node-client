@@ -1,3 +1,4 @@
+var Q = require('Q')
 var prompt = require('prompt')
 
 module.exports = function loadKeyring(callback) {
@@ -27,12 +28,12 @@ module.exports = function loadKeyring(callback) {
   }
 
   function load(passPhrase, callback) {
-    keyring.load(passPhrase, function(err) {
-      if(err) {
-        callback(err)
-      } else {
-        callback(null, keyring)
-      }
+    keyring.load(passPhrase)
+    .then(function() {
+      callback(null, keyring)
+    })
+    .catch(function(error) {
+      callback(error)
     })
   }
 }
