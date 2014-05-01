@@ -7,9 +7,20 @@ module.exports = function loadKeyring(callback) {
   var keyring = require('../../lib/keyring')(keystore)
   var envPassPhrase = process.env.SSQ_CLIENT_PASSPHRASE
 
-  if(envPassPhrase) {
-    load(envPassPhrase, callback)
-  } else {
+  return loadKeyring()
+  .then(function() {
+    return keyring
+  })
+
+  function loadKeyring() {
+    if(envPassPhrase) {
+      return keyring.load(envPassPhrase)
+    } else {
+      return getPassPhrase()
+      .then(keyring.load)
+    }
+  }
+  function getPassPhrase() {
     console.log('You must unlock your private key to perform this operation.')
 
     var schema = {
@@ -18,22 +29,9 @@ module.exports = function loadKeyring(callback) {
       }
     }
 
-    prompt.get(schema, function(err, result) {
-      if(err) {
-        callback(err)
-      } else {
-        load(result.passPhrase, callback)
-      }
-    })
-  }
-
-  function load(passPhrase, callback) {
-    keyring.load(passPhrase)
-    .then(function() {
-      callback(null, keyring)
-    })
-    .catch(function(error) {
-      callback(error)
+    return Q.nfcall(prompt.get, schema)
+    .then(function(result) {
+      return result.passPhrase
     })
   }
 }
