@@ -1,3 +1,4 @@
+var Q = require('Q')
 var prompt = require('prompt')
 var squirrel = require('../../lib/squirrel')
 var tableizeRecords = require('./tableizer').tableizeRecords
@@ -5,114 +6,91 @@ var loadKeyring = require('./load-keyring')
 
 prompt.message = prompt.delimiter = ''
 
+var getContext = Q.nfbind(squirrel.getContext)
+var promptGet = Q.nfbind(prompt.get)
+
 module.exports = function(model, modelName, tableColumns) {
   function create(schema) {
-    squirrel.getContext(loadKeyring, function(err, context) {
-      if(err) {
-        console.log(err)
-      } else {
-        console.log('\nCreating a new', modelName + '.')
-        prompt.get(schema, function(err, result) {
-          if(err) {
-            console.log(err)
-            context.client.close()
-          } else {
-            model.create(context, result, function(err, record) {
-              if(err) {
-                console.log(err)
-              } else {
-                console.log('Created', modelName + ':')
-                console.log(tableizeRecords([record], tableColumns))
-              }
-              context.client.close()
-            })
-          }
-        })
-      }
+    return getContext(loadKeyring)
+    .then(function(context) {
+      console.log('\nCreating a new', modelName + '.')
+      return promptGet(schema)
+      .then(function(result) {
+        return Q.nfcall(model.create, context, result)
+      })
+      .finally(function() {
+        context.client.close()
+      })
+    })
+    .then(function(record) {
+      console.log('Created', modelName + ':')
+      console.log(tableizeRecords([record], tableColumns))
+    })
+    .catch(function(error) {
+      console.log('Error:', error)
     })
   }
 
   function list(schema) {
-    squirrel.getContext(loadKeyring, function(err, context) {
-      if(err) {
-        console.log(err)
-      } else {
-        model.index(context, {}, function(err, result) {
-          if(err) {
-            console.log(err)
-          } else {
-            console.log(tableizeRecords(result, tableColumns))
-          }
-          context.client.close()
-        })
-      }
+    return getContext(loadKeyring)
+    .then(function(context) {
+      return Q.nfcall(model.index, context, {})
+      .finally(function() {
+        context.client.close()
+      })
+    })
+    .then(function(result) {
+      console.log(tableizeRecords(result, tableColumns))
+    })
+    .catch(function(error) {
+      console.log('Error:', error)
     })
   }
-
+  
   function update(schema) {
-    squirrel.getContext(loadKeyring, function(err, context) {
-      if(err) {
-        console.log(err)
-      } else {
-        prompt.get(schema, function(err, result) {
-          console.log('crud update prompt callback', err, result)
-          if(err) {
-            console.log(err)
-            context.client.close()
-          } else {
-            model.update(context, result, function(err, record) {
-              if(err) {
-                console.log(err)
-              } else {
-                console.log('Updated', modelName + ':')
-                console.log(tableizeRecords([record], tableColumns))
-              }
-              context.client.close()
-            })
-          }
-        })
-      }
+    return getContext(loadKeyring)
+    .then(function(context) {
+      return promptGet(schema)
+      .then(function(result) {
+        return Q.nfcall(model.update, context, result)
+      })
+      .finally(function() {
+        context.client.close()
+      })
+    })
+    .then(function(record) {
+      console.log('Updated', modelName + ':')
+      console.log(tableizeRecords([record], tableColumns))
+    })
+    .catch(function(error) {
+      console.log('Error:', error)
     })
   }
 
   function del(schema) {
-    squirrel.getContext(loadKeyring, function(err, context) {
-      if(err) {
-        console.log(err)
-      } else {
-        console.log('\nDeleting a', modelName + '.')
-        prompt.get(schema, function(err, result) {
-          if(err) {
-            console.log(err)
-            context.client.close()
-          } else {
-            var email = result.email
-            model.index(context, { where: { email: email } }, function(err, result) {
-              if(err) {
-                callback(err)
-                context.client.close()
-              } else {
-                if(result && result.length > 0) {
-                  console.log('Deleting:')
-                  console.log(tableizeRecords(result, tableColumns))
-
-                  model.del(context, result[0].id, function(err) {
-                    if(err) {
-                      console.log(err)
-                    } else {
-                      console.log('Deleted', modelName + '.')
-                    }
-                    context.client.close()
-                  })
-                } else {
-                  console.log('Could not find', modelName + '.')
-                  context.client.close()
-                }
-              }
-            })
-          }
-        })
-      }
+    return getContext(loadKeyring)
+    .then(function(context) {
+      console.log('\nDeleting a', modelName + '.')
+      return promptGet(schema)
+      .then(function(result) {
+        var email = result.email
+        return Q.nfcall(model.index, context, { where: { email: email } })
+      })
+      .then(function(records) {
+        if(records && records.length > 0) {
+          console.log('Deleting:')
+          console.log(tableizeRecords(records, tableColumns))
+          return Q.nfcall(model.del, context, records[0].id)
+        } else {
+          console.log('Could not find', modelName + '.')
+        }
+      })
+      .finally(function() {
+        context.client.close()
+      })
+    })
+    .catch(function(error) {
+      console.log('Error:', error)
     })
   }
 
