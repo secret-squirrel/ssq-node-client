@@ -1,7 +1,7 @@
 var Q = require('Q')
 var prompt = require('prompt')
 
-module.exports = function loadKeyring(callback) {
+module.exports = function loadKeyring() {
   var config = require('../../config')
   var keystore = require('../keystore')(config)
   var keyring = require('../../lib/keyring')(keystore)

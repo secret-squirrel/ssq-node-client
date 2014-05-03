@@ -11,66 +11,43 @@ var promptGet = Q.nfbind(prompt.get)
 
 module.exports = function(model, modelName, tableColumns) {
   function create(schema) {
-    return getContext(loadKeyring)
-    .then(function(context) {
+    withContext(function(context) {
       console.log('\nCreating a new', modelName + '.')
       return promptGet(schema)
       .then(function(result) {
         return Q.nfcall(model.create, context, result)
       })
-      .finally(function() {
-        context.client.close()
+      .then(function(record) {
+        console.log('Created', modelName + ':')
+        console.log(tableizeRecords([record], tableColumns))
       })
-    })
-    .then(function(record) {
-      console.log('Created', modelName + ':')
-      console.log(tableizeRecords([record], tableColumns))
-    })
-    .catch(function(error) {
-      console.log('Error:', error)
     })
   }
 
   function list(schema) {
-    return getContext(loadKeyring)
-    .then(function(context) {
+    withContext(function(context) {
       return Q.nfcall(model.index, context, {})
-      .finally(function() {
-        context.client.close()
+      .then(function(result) {
+        console.log(tableizeRecords(result, tableColumns))
       })
     })
-    .then(function(result) {
-      console.log(tableizeRecords(result, tableColumns))
-    })
-    .catch(function(error) {
-      console.log('Error:', error)
-    })
   }
-  
+
   function update(schema) {
-    return getContext(loadKeyring)
-    .then(function(context) {
+    withContext(function(context) {
       return promptGet(schema)
       .then(function(result) {
         return Q.nfcall(model.update, context, result)
       })
-      .finally(function() {
-        context.client.close()
+      .then(function(record) {
+        console.log('Updated', modelName + ':')
+        console.log(tableizeRecords([record], tableColumns))
       })
-    })
-    .then(function(record) {
-      console.log('Updated', modelName + ':')
-      console.log(tableizeRecords([record], tableColumns))
-    })
-    .catch(function(error) {
-      console.log('Error:', error)
     })
   }
 
   function del(schema) {
-    return getContext(loadKeyring)
-    .then(function(context) {
-      console.log('\nDeleting a', modelName + '.')
+    withContext(function(context) {
       return promptGet(schema)
       .then(function(result) {
         var email = result.email
@@ -78,19 +55,30 @@ module.exports = function(model, modelName, tableColumns) {
       })
       .then(function(records) {
         if(records && records.length > 0) {
-          console.log('Deleting:')
-          console.log(tableizeRecords(records, tableColumns))
+          console.log('Deleting:', tableizeRecords(records, tableColumns))
           return Q.nfcall(model.del, context, records[0].id)
         } else {
           console.log('Could not find', modelName + '.')
         }
       })
-      .finally(function() {
-        context.client.close()
-      })
+    })
+  }
+
+  function withContext(promise) {
+    var context
+    return getContext(loadKeyring)
+    .then(function(_context) {
+      context = _context
+      return promise(context)
     })
     .catch(function(error) {
       console.log('Error:', error)
+    })
+    .finally(function() {
+      if (context) {
+        context.client.close()
+      }
+      process.exit()
     })
   }
 

@@ -11,6 +11,7 @@ function create() {
         description: 'Enter a name for the new ' + modelName + ':'
       },
       url: {
+        format: 'url',
         allowEmpty: false,
         description: 'Enter a url: '
       },
