@@ -10,12 +10,8 @@ var keystore = require('./keystore')(config)
 var Keyring = squirrel.Keyring(keystore)
 var loadKeyring = require('./helpers/load-keyring')
 
-var promptGet = Q.nfbind(prompt.get)
-var sqGetContext = Q.nfbind(squirrel.getContext)
-var sqPublicKeyCreate = Q.nfbind(PublicKey.create)
-
 function create() {
-  promptGet(schema())
+  Q.nfcall(prompt.get, schema())
   .then(generateKeypair)
   .then(getContext)
   .then(createPublicKey)
@@ -56,7 +52,7 @@ function generateKeypair(result) {
 }
 
 function getContext() {
-  return sqGetContext(loadKeyring)
+  return Q.nfcall(squirrel.getContext, loadKeyring)
 }
 
 function createPublicKey(context) {
@@ -66,7 +62,7 @@ function createPublicKey(context) {
     fingerprint: publicKey.primaryKey.fingerprint,
     publicKey: publicKey.armor()
   }
-  return sqPublicKeyCreate(context, publicKeyData)
+  return Q.nfcall(PublicKey.create, context, publicKeyData)
 }
 
 function handleError(error) {
