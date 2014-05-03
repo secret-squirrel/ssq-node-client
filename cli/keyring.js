@@ -52,7 +52,7 @@ function generateKeypair(result) {
 }
 
 function getContext() {
-  return Q.nfcall(squirrel.getContext, loadKeyring)
+  return squirrel.getContext(loadKeyring)
 }
 
 function createPublicKey(context) {

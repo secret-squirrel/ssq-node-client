@@ -6,7 +6,6 @@ var loadKeyring = require('./load-keyring')
 
 prompt.message = prompt.delimiter = ''
 
-var getContext = Q.nfbind(squirrel.getContext)
 var promptGet = Q.nfbind(prompt.get)
 
 module.exports = function(model, modelName, tableColumns) {
@@ -60,7 +59,7 @@ module.exports = function(model, modelName, tableColumns) {
 
   function withContext(promise) {
     var context
-    return getContext(loadKeyring)
+    return squirrel.getContext(loadKeyring)
     .then(function(_context) {
       context = _context
       return promise(context)
