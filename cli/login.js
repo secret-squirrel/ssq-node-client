@@ -55,9 +55,10 @@ function update() {
 function del() {
   crud.del({
     properties: {
-      email: {
+      id: {
+        format: 'id',
         allowEmpty: false,
-        description: 'Enter the email of the user you wish to delete: '
+        description: 'Enter the ID of the ' + modelName + ' you wish to delete: '
       }
     }
   })

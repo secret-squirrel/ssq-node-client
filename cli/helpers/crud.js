@@ -50,16 +50,10 @@ module.exports = function(model, modelName, tableColumns) {
     withContext(function(context) {
       return promptGet(schema)
       .then(function(result) {
-        var email = result.email
-        return Q.nfcall(model.index, context, { where: { email: email } })
+        return Q.nfcall(model.del, context, result.id)
       })
-      .then(function(records) {
-        if(records && records.length > 0) {
-          console.log('Deleting:', tableizeRecords(records, tableColumns))
-          return Q.nfcall(model.del, context, records[0].id)
-        } else {
-          console.log('Could not find', modelName + '.')
-        }
+      .then(function() {
+        console.log('Deleted.')
       })
     })
   }
