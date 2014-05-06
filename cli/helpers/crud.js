@@ -14,7 +14,7 @@ module.exports = function(model, modelName, tableColumns) {
       console.log('\nCreating a new', modelName + '.')
       return promptGet(schema)
       .then(function(result) {
-        return Q.nfcall(model.create, context, result)
+        return model.create(context, result)
       })
       .then(function(record) {
         console.log('Created', modelName + ':')
@@ -25,7 +25,7 @@ module.exports = function(model, modelName, tableColumns) {
 
   function list(schema) {
     withContext(function(context) {
-      return Q.nfcall(model.index, context, {})
+      return model.index(context, {})
       .then(function(result) {
         console.log(tableizeRecords(result, tableColumns))
       })
@@ -36,7 +36,7 @@ module.exports = function(model, modelName, tableColumns) {
     withContext(function(context) {
       return promptGet(schema)
       .then(function(result) {
-        return Q.nfcall(model.update, context, result)
+        return model.update(context, result)
       })
       .then(function(record) {
         console.log('Updated', modelName + ':')
@@ -49,7 +49,7 @@ module.exports = function(model, modelName, tableColumns) {
     withContext(function(context) {
       return promptGet(schema)
       .then(function(result) {
-        return Q.nfcall(model.del, context, result.id)
+        return model.del(context, result.id)
       })
       .then(function() {
         console.log('Deleted.')
