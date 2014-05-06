@@ -53,7 +53,7 @@ describe('ws/client', function() {
     })
   })
 
-  it('sends request messages', function(done) {
+  it('sends request messages', function() {
     wss.on('connection', function(ws) {
       ws.on('message', function(str) {
         var msg = JSON.parse(str)
@@ -66,16 +66,11 @@ describe('ws/client', function() {
       })
     })
 
-    wsc.connect(privateKey)
+    var promise = wsc.connect(privateKey)
     .then(function() {
       return wsc.request('status', null)
     })
-    .then(function(response) {
-      assert.equal(response, 'All systems go') 
-      done()
-    })
-    .catch(function(err) {
-      assert.notOk(err, 'Failed to request: ' + err)
-    })
+
+    assert.eventually.equal(promise, 'All systems go')
   })
 })

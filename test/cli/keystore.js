@@ -19,49 +19,33 @@ describe('keystore', function() {
     fs.mkdirpSync(config.userConfigDir)
   })
 
-  it('stores private key data', function(done) {
-    keystore.storePrivate(privateKeyData)
+  it('stores private key data', function() {
+    var promise = keystore.storePrivate(privateKeyData)
     .then(function() {
-      assert(fs.existsSync(path.join(config.userConfigDir, 'secring.json'), 'Saves private key to disk'))
+      return fs.existsSync(path.join(config.userConfigDir, 'secring.json'))
     })
-    .catch(function(err) {
-      assert.notOk(err, 'Failed to store private key data: ' + err)
-    })
-    .finally(done)
+
+    assert.eventually.equal(promise, true)
   })
 
-  it('loads private key data', function(done) {
-    keystore.storePrivate(privateKeyData)
-    .then(keystore.loadPrivate)
-    .then(function(keyData) {
-      assert.equal(keyData, privateKeyData, 'Load private key data')
-    })
-    .catch(function(err) {
-      assert.notOk(err, 'Failed to load private key data: ' + err)
-    })
-    .finally(done)
+  it('loads private key data', function() {
+    var promise = keystore.storePrivate(privateKeyData).then(keystore.loadPrivate)
+    return assert.eventually.equal(promise, privateKeyData)
   })
 
-  it('stores public keys', function(done) {
-    keystore.storePublic(publicKeyData)
+  it('stores public keys', function() {
+    var promise = keystore.storePublic(publicKeyData)
     .then(function() {
-      assert(fs.existsSync(path.join(config.userConfigDir, 'pubring.json'), 'Saves public key to disk'))
+      return fs.existsSync(path.join(config.userConfigDir, 'pubring.json'))
     })
-    .catch(function(err) {
-      assert.notOk(err, 'Failed to store public key data: ' + err)
-    })
-    .finally(done)
+
+    return assert.eventually.equal(promise, true)
   })
 
-  it('loads public keys', function(done) {
-    keystore.storePublic(publicKeyData)
+  it('loads public keys', function() {
+    var promise = keystore.storePublic(publicKeyData)
     .then(keystore.loadPublic)
-    .then(function(keyData) {
-      assert.equal(keyData, publicKeyData, 'Load public key data')
-    })
-    .catch(function(err) {
-      assert.notOk(err, 'Failed to store public key data: ' + err)
-    })
-    .finally(done)
+
+    return assert.eventually.equal(promise, publicKeyData)
   })
 })
