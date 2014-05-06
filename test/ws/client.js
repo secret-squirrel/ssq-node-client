@@ -23,8 +23,13 @@ describe('ws/client', function() {
   })
 
   it('connects to a secure websocket server', function(done) {
-    wsc.connect(privateKey, function() {
-      done()  
+    wss.on('connection', function(ws) {
+      done()
+    })
+
+    wsc.connect(privateKey)
+    .catch(function(err) {
+      assert.notOk(err, 'Failed to connect: ' + err)
     })
   })
 
@@ -39,8 +44,12 @@ describe('ws/client', function() {
       })
     })
 
-    wsc.connect(keypair, function(err) {
-      wsc.notify('hello')
+    wsc.connect(privateKey)
+    .then(function() {
+      return wsc.notify('hello')
+    })
+    .catch(function(err) {
+      assert.notOk(err, 'Failed to notify: ' + err)
     })
   })
 
@@ -57,11 +66,16 @@ describe('ws/client', function() {
       })
     })
 
-    wsc.connect(keypair, function(err) {
-      wsc.request('status', null, function(err, response) {
-        assert.equal(response, 'All systems go') 
-        done()
-      })
+    wsc.connect(privateKey)
+    .then(function() {
+      return wsc.request('status', null)
+    })
+    .then(function(response) {
+      assert.equal(response, 'All systems go') 
+      done()
+    })
+    .catch(function(err) {
+      assert.notOk(err, 'Failed to request: ' + err)
     })
   })
 })

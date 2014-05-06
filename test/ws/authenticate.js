@@ -29,6 +29,6 @@ describe('ws/authenticate', function() {
         done()
       })
     })
-    authenticate(privateKey, ws, function(err){})
+    authenticate(privateKey, ws)
   })
 })
