@@ -35,27 +35,33 @@ describe('keyring', function() {
 
   it('stores the keyring', function(done) {
     keyring.createKeyPair(passPhrase, userId, bits)
-    keyring.store(function(err) {
-      assert.notOk(err)
+    keyring.store()
+    .then(function() {
       var privateKeys = path.join(config.userConfigDir, 'secring.json')
       var publicKeys = path.join(config.userConfigDir, 'pubring.json')
       assert(fs.existsSync(privateKeys), 'Saves private keys to disk')
       assert(fs.existsSync(publicKeys), 'Saves public keys to disk')
       done()
     })
+    .catch(function(err) {
+      assert.notOk(err)
+    })
   })
 
   it('loads the keyring', function(done) {
     keyring.createKeyPair(passPhrase, userId, bits)
-    keyring.store(function(err) {
-      assert.notOk(err)
+    keyring.store()
+    .then(function() {
       var newKeyring = require('../lib/keyring')(keystore)
-      newKeyring.load(passPhrase, function(err) {
-        assert.notOk(err)
+      return newKeyring.load(passPhrase)
+      .then(function() {
         assert.equal(newKeyring.publicKeys().length, 1)
         assert.equal(newKeyring.privateKeys().length, 1)
         done()
       })
+    })
+    .catch(function(err) {
+      assert.notOk(err)
     })
   })
 })
