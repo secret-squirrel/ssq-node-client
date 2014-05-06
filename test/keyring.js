@@ -1,39 +1,61 @@
 var fs = require('fs')
 var path = require('path')
 var openpgp = require('openpgp')
-var keyring = require('../lib/keyring')
-
 var passPhrase = 's00pers3krit'
 var userId = 'test user <test@example.com>'
 var bits = 512
 
 describe('keyring', function() {
+  var config = {
+      userConfigDir: path.join(__dirname, '../tmp/config')
+    }
+  var keystore = require('../cli/keystore')(config)
+  var keyring
 
-  it('creates a public/private keypair with the private key encrypted', function() {
-    var keyPair = keyring.createKeyPair(passPhrase, userId, bits)
-
-    var privateKey = openpgp.key.readArmored(keyPair.privateKey)
-    assert.equal(privateKey.keys.length, 1, 'Failed to parsed ASCII-armored private key string')
-    assert(privateKey.keys[0].decrypt(passPhrase), 'Failed to decrypt')
-    assert.equal(keyPair.privateKey, privateKey.keys[0].armor(), 're-armoring matches original')
-
-    var publicKey = openpgp.key.readArmored(keyPair.publicKey)
-    assert.equal(publicKey.keys.length, 1, 'Failed to parsed ASCII-armored public key string')
-    assert.equal(keyPair.publicKey, publicKey.keys[0].armor(), 're-armoring matches original')
+  before(function() {
+    keyring = require('../lib/keyring')(keystore)
   })
 
-  it('saves keypairs to the config directory', function() {
-    var keyPair = require('./fixtures/keypair')
-    var configDir = path.join(process.cwd(), 'tmp/.squirrel')
-    var privateKey = path.join(configDir, 'private-key.asc')
-    var publicKey = path.join(configDir, 'public-key.asc')
-    if(fs.existsSync(privateKey)) fs.unlinkSync(privateKey)
-    if(fs.existsSync(publicKey)) fs.unlinkSync(publicKey)
+  afterEach(function() {
+    keyring.clear()
+  })
 
-    keyring.saveToKeyRing(keyPair, configDir, function() {
-      assert(fs.existsSync(privateKey), 'Saves private key to disk')
-      assert(fs.existsSync(publicKey), 'Saves public key to disk')
+  it('creates a public/private keypair', function() {
+    keyring.createKeyPair(passPhrase, userId, bits)
+    assert.equal(keyring.publicKeys().length, 1)
+    assert.equal(keyring.privateKeys().length, 1)
+  })
+
+  it('clears the keyring', function() {
+    keyring.createKeyPair(passPhrase, userId, bits)
+    keyring.clear()
+    assert.equal(keyring.publicKeys().length, 0)
+    assert.equal(keyring.privateKeys().length, 0)
+  })
+
+  it('stores the keyring', function(done) {
+    keyring.createKeyPair(passPhrase, userId, bits)
+    keyring.store(function(err) {
+      assert.notOk(err)
+      var privateKeys = path.join(config.userConfigDir, 'secring.json')
+      var publicKeys = path.join(config.userConfigDir, 'pubring.json')
+      assert(fs.existsSync(privateKeys), 'Saves private keys to disk')
+      assert(fs.existsSync(publicKeys), 'Saves public keys to disk')
+      done()
     })
+  })
 
+  it('loads the keyring', function(done) {
+    keyring.createKeyPair(passPhrase, userId, bits)
+    keyring.store(function(err) {
+      assert.notOk(err)
+      var newKeyring = require('../lib/keyring')(keystore)
+      newKeyring.load(passPhrase, function(err) {
+        assert.notOk(err)
+        assert.equal(newKeyring.publicKeys().length, 1)
+        assert.equal(newKeyring.privateKeys().length, 1)
+        done()
+      })
+    })
   })
 })
