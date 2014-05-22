@@ -1,118 +1,77 @@
+var Q = require('Q')
 var prompt = require('prompt')
 var squirrel = require('../../lib/squirrel')
 var tableizeRecords = require('./tableizer').tableizeRecords
-var passPhrasePrompt = require('./passphrase-prompt')
+var loadKeyring = require('./load-keyring')
 
 prompt.message = prompt.delimiter = ''
 
+var promptGet = Q.nfbind(prompt.get)
+
 module.exports = function(model, modelName, tableColumns) {
   function create(schema) {
-    squirrel.getContext(passPhrasePrompt, function(err, context) {
-      if(err) {
-        console.log(err)
-      } else {
-        console.log('\nCreating a new', modelName + '.')
-        prompt.get(schema, function(err, result) {
-          if(err) {
-            console.log(err)
-            context.client.close()
-          } else {
-            model.create(context, result, function(err, record) {
-              if(err) {
-                console.log(err)
-              } else {
-                console.log('Created', modelName + ':')
-                console.log(tableizeRecords([record], tableColumns))
-              }
-              context.client.close()
-            })
-          }
-        })
-      }
+    withContext(function(context) {
+      console.log('\nCreating a new', modelName + '.')
+      return promptGet(schema)
+      .then(function(result) {
+        return model.create(context, result)
+      })
+      .then(function(record) {
+        console.log('Created', modelName + ':')
+        console.log(tableizeRecords([record], tableColumns))
+      })
     })
   }
 
   function list(schema) {
-    squirrel.getContext(passPhrasePrompt, function(err, context) {
-      if(err) {
-        console.log(err)
-      } else {
-        model.index(context, {}, function(err, result) {
-          if(err) {
-            console.log(err)
-          } else {
-            console.log(tableizeRecords(result, tableColumns))
-          }
-          context.client.close()
-        })
-      }
+    withContext(function(context) {
+      return model.index(context, {})
+      .then(function(result) {
+        console.log(tableizeRecords(result, tableColumns))
+      })
     })
   }
 
   function update(schema) {
-    squirrel.getContext(passPhrasePrompt, function(err, context) {
-      if(err) {
-        console.log(err)
-      } else {
-        prompt.get(schema, function(err, result) {
-          console.log('crud update prompt callback', err, result)
-          if(err) {
-            console.log(err)
-            context.client.close()
-          } else {
-            model.update(context, result, function(err, record) {
-              if(err) {
-                console.log(err)
-              } else {
-                console.log('Updated', modelName + ':')
-                console.log(tableizeRecords([record], tableColumns))
-              }
-              context.client.close()
-            })
-          }
-        })
-      }
+    withContext(function(context) {
+      return promptGet(schema)
+      .then(function(result) {
+        return model.update(context, result)
+      })
+      .then(function(record) {
+        console.log('Updated', modelName + ':')
+        console.log(tableizeRecords([record], tableColumns))
+      })
     })
   }
 
   function del(schema) {
-    squirrel.getContext(passPhrasePrompt, function(err, context) {
-      if(err) {
-        console.log(err)
-      } else {
-        console.log('\nDeleting a', modelName + '.')
-        prompt.get(schema, function(err, result) {
-          if(err) {
-            console.log(err)
-            context.client.close()
-          } else {
-            var email = result.email
-            model.index(context, { where: { email: email } }, function(err, result) {
-              if(err) {
-                callback(err)
-                context.client.close()
-              } else {
-                if(result && result.length > 0) {
-                  console.log('Deleting:')
-                  console.log(tableizeRecords(result, tableColumns))
+    withContext(function(context) {
+      return promptGet(schema)
+      .then(function(result) {
+        return model.del(context, result.id)
+      })
+      .then(function() {
+        console.log('Deleted.')
+      })
+    })
+  }
 
-                  model.del(context, result[0].id, function(err) {
-                    if(err) {
-                      console.log(err)
-                    } else {
-                      console.log('Deleted', modelName + '.')
-                    }
-                    context.client.close()
-                  })
-                } else {
-                  console.log('Could not find', modelName + '.')
-                  context.client.close()
-                }
-              }
-            })
-          }
-        })
+  function withContext(promise) {
+    var context
+    return squirrel.getContext(loadKeyring)
+    .then(function(_context) {
+      context = _context
+      return promise(context)
+    })
+    .catch(function(error) {
+      console.log('Error:', error)
+    })
+    .finally(function() {
+      if (context) {
+        context.client.close()
       }
+      process.exit()
     })
   }
 

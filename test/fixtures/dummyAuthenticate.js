@@ -1,3 +1,5 @@
-module.exports = function(keypair, ws, callback) { 
-  if(callback) callback() 
+var Q = require('Q')
+
+module.exports = function(keypair, ws) {
+  return Q()  
 }
