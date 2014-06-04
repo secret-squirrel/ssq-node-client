@@ -1,5 +1,5 @@
 var modelName = 'user'
-var model = require('../lib/squirrel').User
+var model = require('../index').User
 var tableColumns = ['id', 'name', 'email', 'isAdmin']
 var crud = require('./helpers/crud')(model, modelName, tableColumns)
 

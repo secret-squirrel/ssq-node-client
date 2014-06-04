@@ -1,22 +1,25 @@
-#!/usr/bin/env node
+var config = require('./config')
+var authenticate = require('./lib/ws/authenticate')
+var WsClient = require('./lib/ws/client').WsClient
 
-var program = require('commander')
-var prompt = require('prompt')
-var pkg = require('./package.json')
+var uri = config.server.uri
+var userConfigDir = config.userConfigDir
 
-prompt.message = prompt.delimiter = ''
-
-program.version(pkg.version)
-
-var modules = ['keyring', 'user', 'login']
-modules.forEach(function(module) {
-  require('./cli/' + module)(program)
-})
-
-program.command('*').action(program.help)
-program.parse(process.argv)
-
-if(process.argv.length <= 2) {
-  program.help()
+function getContext(loadKeyring) {
+  return loadKeyring()
+  .then(function(keyring) {
+    var wsc = WsClient(uri, authenticate)
+    return wsc.connect(keyring.defaultKey())
+    .then(function(user) {
+      return { keyring: keyring, client: wsc, user: user }
+    })
+  })
 }
 
+module.exports = {
+  getContext: getContext,
+  Keyring: require('./lib/keyring'),
+  User: require('./lib/user'),
+  Login: require('./lib/login'),
+  PublicKey: require('./lib/publicKey')
+}

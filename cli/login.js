@@ -1,5 +1,5 @@
 var modelName = 'login'
-var model = require('../lib/squirrel').Login
+var model = require('../index').Login
 var tableColumns = ['id', 'name', 'url', 'notes']
 var crud = require('./helpers/crud')(model, modelName, tableColumns)
 

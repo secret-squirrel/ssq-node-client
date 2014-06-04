@@ -1,6 +1,6 @@
 var Q = require('Q')
 var prompt = require('prompt')
-var squirrel = require('../../lib/squirrel')
+var squirrel = require('../../index')
 var tableizeRecords = require('./tableizer').tableizeRecords
 var loadKeyring = require('./load-keyring')
 

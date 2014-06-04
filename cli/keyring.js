@@ -3,7 +3,7 @@ var Q = require('Q')
 var prompt = require('prompt')
 prompt.message = prompt.delimiter = ''
 
-var squirrel = require('../lib/squirrel')
+var squirrel = require('../index')
 var PublicKey = squirrel.PublicKey
 var config = require('../config')
 var keystore = require('./keystore')(config)
