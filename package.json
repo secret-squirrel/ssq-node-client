@@ -1,18 +1,18 @@
 {
-  "name": "secretsquirrel-cli",
+  "name": "ssq",
   "version": "0.0.0",
-  "description": "Secret Squirrel - Console Client",
+  "description": "Secret Squirrel - Client Library",
   "main": "squirrel",
   "scripts": {
     "test": "./node_modules/.bin/mocha"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/twg/secretsquirrel-cli"
+    "url": "https://github.com/secret-squirrel/ssq-node-client"
   },
   "author": "",
   "bugs": {
-    "url": "https://github.com/twg/secretsquirrel-cli/issues"
+    "url": "https://github.com/secret-squirrel/ssq-node-client/issues"
   },
   "dependencies": {
     "q": "~1.0.1",
