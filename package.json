@@ -21,7 +21,7 @@
     "commander": "~2.2.0",
     "async": "~0.6.2",
     "prompt": "~0.2.12",
-    "openpgp": "~0.6.0",
+    "openpgp": "git://github.com/mmacaulay/openpgpjs.git#node-webkit",
     "fs.extra": "~1.2.1",
     "cli-table": "~0.3.0",
     "array.prototype.find": "~0.1.1"
