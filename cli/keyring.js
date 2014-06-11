@@ -62,7 +62,7 @@ function createPublicKey(context) {
     fingerprint: publicKey.primaryKey.fingerprint,
     publicKey: publicKey.armor()
   }
-  return Q.nfcall(PublicKey.create, context, publicKeyData)
+  return PublicKey.create(context, publicKeyData)
 }
 
 function handleError(error) {
