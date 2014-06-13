@@ -8,17 +8,26 @@ var PublicKey = squirrel.PublicKey
 var config = require('../config')
 var keystore = require('./keystore')(config)
 var Keyring = squirrel.Keyring(keystore)
-var loadKeyring = require('./helpers/load-keyring')
+
+var loadKeyring = function() {
+  return require('./helpers/load-keyring')(Keyring)
+}
 
 function create() {
-  Q.nfcall(prompt.get, schema())
-  .then(generateKeypair)
-  .then(getContext)
-  .then(createPublicKey)
-  .then(Keyring.store)
+  getContext()
+  .then(function(context) {
+    return getSchema()
+    .then(generateKeypair)
+    .then(function() { return createPublicKey(context) })
+    .then(Keyring.store)
+  })
   .then(handleSuccess)
   .catch(handleError)
   .done(process.exit)
+}
+
+function getSchema() {
+  return Q.nfcall(prompt.get, schema())
 }
 
 function schema() {
@@ -48,7 +57,7 @@ function generateKeypair(result) {
   var bits = parseInt(result.bits)
   var passPhrase = result.passPhrase
 
-  return Keyring.createKeyPair(passPhrase, '', bits)
+  return Keyring.createKeyPair(passPhrase, bits)
 }
 
 function getContext() {

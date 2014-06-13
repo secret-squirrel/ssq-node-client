@@ -1,10 +1,7 @@
 var Q = require('Q')
 var prompt = require('prompt')
 
-module.exports = function loadKeyring() {
-  var config = require('../../config')
-  var keystore = require('../keystore')(config)
-  var keyring = require('../../lib/keyring')(keystore)
+module.exports = function loadKeyring(keyring) {
   var envPassPhrase = process.env.SSQ_CLIENT_PASSPHRASE
 
   return loadKeyring()
