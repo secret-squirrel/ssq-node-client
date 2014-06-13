@@ -2,7 +2,13 @@ var Q = require('Q')
 var prompt = require('prompt')
 var squirrel = require('../../index')
 var tableizeRecords = require('./tableizer').tableizeRecords
-var loadKeyring = require('./load-keyring')
+var config = require('../../config')
+var keystore = require('../keystore')(config)
+var Keyring = squirrel.Keyring(keystore)
+
+var loadKeyring = function() {
+  return require('./load-keyring')(Keyring)
+}
 
 prompt.message = prompt.delimiter = ''
 
