@@ -21,7 +21,7 @@ describe('keyring', function() {
   })
 
   it('creates a public/private keypair', function(done) {
-    keyring.createKeyPair(passPhrase, bits)
+    keyring.createKeyPair(passPhrase, userId, bits)
     .then(function() {
       assert.equal(keyring.publicKeys().length, 1)
       assert.equal(keyring.privateKeys().length, 1)
@@ -30,7 +30,7 @@ describe('keyring', function() {
   })
 
   it('clears the keyring', function(done) {
-    keyring.createKeyPair(passPhrase, bits)
+    keyring.createKeyPair(passPhrase, userId, bits)
     .then(function() {
       assert.equal(keyring.publicKeys().length, 1)
       assert.equal(keyring.privateKeys().length, 1)
@@ -42,7 +42,7 @@ describe('keyring', function() {
   })
 
   it('stores the keyring', function(done) {
-    keyring.createKeyPair(passPhrase, bits)
+    keyring.createKeyPair(passPhrase, userId, bits)
     .then(function() {
       keyring.store()
       .then(function() {
@@ -59,7 +59,7 @@ describe('keyring', function() {
   })
 
   it('loads the keyring', function(done) {
-    keyring.createKeyPair(passPhrase, bits)
+    keyring.createKeyPair(passPhrase, userId, bits)
     .then(function() {
       keyring.store()
       .then(function() {
